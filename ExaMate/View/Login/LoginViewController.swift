@@ -233,7 +233,9 @@ extension LoginViewController : LoginViewControllerInterface {
         loginButton.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
     }
     @objc func didTapSignUpButton() {
-       
+        let vc = SignupViewController()
+         vc.modalPresentationStyle = .fullScreen
+         self.navigationController?.present(vc, animated: true)
     }
     @objc func didTapLoginButton() {
         guard let email = emailTextField.text, !email.isEmpty,
@@ -246,3 +248,5 @@ extension LoginViewController : LoginViewControllerInterface {
     }
     
 }
+
+

@@ -7,9 +7,19 @@
 
 import UIKit
 
+protocol SignupViewControllerInterface : AnyObject {
+    func setFrames()
+    func configViews()
+    func showAlert(title : String, message : String)
+    func didTapLoginButton()
+    func didTapSignUpButton()
+    func addTarget()
+
+}
 
 class SignupViewController: UIViewController {
-    
+    var user: User?
+
     let viewModel = SignupViewModel()
    
     private let logoImgView : UIImageView = {
@@ -151,15 +161,66 @@ class SignupViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        configViews()
-        
-        signUpButton.addTarget(self, action: #selector(didTapSignUpButton), for: .touchUpInside)
-        loginButton.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
+        view.backgroundColor = .systemBackground       
         // Do any additional setup after loading the view.
+        viewModel.view = self
+        viewModel.viewDidLoad()
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        viewModel.viewDidLayoutSubviews()
+    }
+}
+
+extension SignupViewController : SignupViewControllerInterface{
+    func addTarget() {
+        signUpButton.addTarget(self, action: #selector(didTapSignUpButton), for: .touchUpInside)
+        loginButton.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
+    }
+    @objc func didTapSignUpButton() {
+        guard let username = usernameTextField.text, !username.isEmpty,
+              let email = emailTextField.text, !email.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty, password.count >= 6 
+        
+        else {
+            self.showAlert(title: "Error!", message: "Fill in your information to sign up")
+            return
+        }
+        user = User(username: username, email: email, password: password)
+        viewModel.signup(user: user!)
+    }
+    @objc func didTapLoginButton() {
+        dismiss(animated: true)
+        
+    }
+    func showAlert(title : String, message : String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK!", style: .cancel)
+        alert.addAction(action)
+        present(alert, animated: true)
+        
+    }
+    func configViews(){
+        view.addSubview(logoImgView)
+        view.addSubview(loginLabel)
+        view.addSubview(secondaryLoginLabel)
+        
+        usernameTextField.addSubview(usernameTextFieldImgView)
+        view.addSubview(usernameTextField)
+        
+        emailTextField.addSubview(emailTextFieldImgView)
+        view.addSubview(emailTextField)
+        
+        passwordTextField.addSubview(passwordTextFieldKeyImgView)
+        passwordTextField.addSubview(passwordTextFieldEyeImgView)
+        view.addSubview(passwordTextField)
+        
+        view.addSubview(loginButton)
+        view.addSubview(signUpButton)
+
+    }
+    
+    func setFrames() {
         
         let logoWidth : CGFloat = 200
         logoImgView.frame = CGRect(x: 10,
@@ -213,48 +274,7 @@ class SignupViewController: UIViewController {
                                     width: (view.width-60)/2-3,
                                     height: 50)
     }
-}
 
-extension SignupViewController {
-    func configViews(){
-        view.addSubview(logoImgView)
-        view.addSubview(loginLabel)
-        view.addSubview(secondaryLoginLabel)
-        
-        usernameTextField.addSubview(usernameTextFieldImgView)
-        view.addSubview(usernameTextField)
-        
-        emailTextField.addSubview(emailTextFieldImgView)
-        view.addSubview(emailTextField)
-        
-        passwordTextField.addSubview(passwordTextFieldKeyImgView)
-        passwordTextField.addSubview(passwordTextFieldEyeImgView)
-        view.addSubview(passwordTextField)
-        
-        view.addSubview(loginButton)
-        view.addSubview(signUpButton)
-
-    }
-    @objc func didTapSignUpButton() {
-        guard let username = usernameTextField.text, !username.isEmpty,
-              let email = emailTextField.text, !email.isEmpty,
-              let password = passwordTextField.text, !password.isEmpty, password.count >= 6 else {
-            self.showAlert(title: "Error!", message: "Fill in your information to sign up")
-            return
-        }
-        
-    }
-    @objc func didTapLoginButton() {
-        dismiss(animated: true)
-        
-    }
-    func showAlert(title : String, message : String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK!", style: .cancel)
-        alert.addAction(action)
-        present(alert, animated: true)
-        
-    }
 }
 
 

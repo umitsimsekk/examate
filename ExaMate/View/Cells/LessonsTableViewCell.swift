@@ -2,7 +2,7 @@
 //  LessonsTableViewCell.swift
 //  ExamMate1
 //
-//  Created by Ümit Şimşek on 20.01.2024.
+// 
 //
 
 import UIKit

@@ -12,6 +12,7 @@ import FirebaseAuth
 protocol AuthManagerProtocol {
     func createUser(withEmail email : String, password: String, completion: @escaping(Bool)->Void)
     func signIn(withEmail email: String, password: String, completion: @escaping(Bool)->Void)
+    func getCurrentUserEmail() -> String
 
 }
 class AuthManager : AuthManagerProtocol {
@@ -34,6 +35,13 @@ class AuthManager : AuthManagerProtocol {
             }
             completion(true)
         }
+    }
+    
+    func getCurrentUserEmail() -> String {
+        guard let currentUserEmail = auth.currentUser?.email as? String else {
+            return ""
+        }
+        return currentUserEmail
     }
 
 }

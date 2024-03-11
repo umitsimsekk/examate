@@ -2,7 +2,7 @@
 //  FeedTableViewCell.swift
 //  ExamMate1
 //
-//  Created by Ümit Şimşek on 26.11.2023.
+//  
 //
 
 import UIKit
@@ -111,23 +111,6 @@ extension FeedTableViewCell {
         self.questionTextLabel.text = model.question
         self.lessonNameLabel.text = model.lesson        
         guard let url = model.imgUrl else { return }
-        
-        self.postImgView.sd_setImage(with: url)
-        db.getUsername(email: model.postedBy) { usern in
-            self.usernameLabel.text = usern
-        }
-        db.getCommentsCount(postId: model.postId) { count in
-            if count == 0 {
-                self.answerLabel.text = "Henüz yanıt yok"
-            } else {
-                self.answerLabel.text = "\(count) yanıt"
-            }
-        }
-        
-        db.getUserProfilePhoto(email: model.postedBy) { url in
-            guard let imgUrl = url else {return }
-            self.profileImgView.sd_setImage(with: url)
-        }
         
     }
     

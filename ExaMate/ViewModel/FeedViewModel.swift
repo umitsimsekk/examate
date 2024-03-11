@@ -2,7 +2,7 @@
 //  FeedViewModel.swift
 //  ExamMate1
 //
-//  Created by Ümit Şimşek on 28.11.2023.
+//  
 //
 
 import UIKit
@@ -55,7 +55,6 @@ extension FeedViewModel : FeedViewModelInterface {
     }
     func cellForRow(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.identifier, for: indexPath) as? FeedTableViewCell else {
-            print("erer")
             return UITableViewCell()
         }
         cell.configure(with: self.posts![indexPath.row])
@@ -67,13 +66,7 @@ extension FeedViewModel : FeedViewModelInterface {
     }
     
     func didSelectItem(at indexPath: IndexPath) -> UIViewController {
-        guard let posts = posts else { return UIViewController() }
-        let post = posts[indexPath.row]
-        let vc = CommentViewController()
-        vc.configure(with: post)
-        vc.navigationItem.largeTitleDisplayMode = .never
-        vc.title = "Post"
-        return vc
+      UIViewController()
     }
     
     

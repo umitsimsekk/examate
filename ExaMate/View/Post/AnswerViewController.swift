@@ -18,7 +18,6 @@ class AnswerViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(answerTableView)
-        // Do any additional setup after loading the view.
         title = "Doğru cevap"
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true

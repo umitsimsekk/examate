@@ -27,13 +27,13 @@ extension SignupViewModel : SignupViewModelInterface {
             if created {
                 self.database.insertUser(model: user) { inserted in
                     if inserted {
-                        self.view?.showAlert(title: "Success", message: "Successfuly signed up")
+                        self.view?.showAlert(title: "Success", message: "Successfuly signed up",action: true)
                     } else {
-                        self.view?.showAlert(title: "Error", message: "Failed insert")
+                        self.view?.showAlert(title: "Error", message: "Failed insert",action: false)
                     }
                 }
             } else {
-                self.view?.showAlert(title: "Error!", message: "Failed to sign up..." )
+                self.view?.showAlert(title: "Error!", message: "Failed to sign up...",action: false )
             }
         }
     }

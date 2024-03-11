@@ -10,7 +10,7 @@ import UIKit
 protocol SignupViewControllerInterface : AnyObject {
     func setFrames()
     func configViews()
-    func showAlert(title : String, message : String)
+    func showAlert(title: String, message: String, action: Bool)
     func didTapLoginButton()
     func didTapSignUpButton()
     func addTarget()
@@ -183,7 +183,7 @@ extension SignupViewController : SignupViewControllerInterface{
               let password = passwordTextField.text, !password.isEmpty, password.count >= 6 
         
         else {
-            self.showAlert(title: "Error!", message: "Fill in your information to sign up")
+            self.showAlert(title: "Error!", message: "Fill in your information to sign up",action: false)
             return
         }
         user = User(username: username, email: email, password: password)
@@ -193,12 +193,19 @@ extension SignupViewController : SignupViewControllerInterface{
         dismiss(animated: true)
         
     }
-    func showAlert(title : String, message : String) {
+    func showAlert(title: String, message: String, action: Bool) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK!", style: .cancel)
-        alert.addAction(action)
+        let act : UIAlertAction
+        if action{
+            act = UIAlertAction(title: "Login!", style: .cancel, handler: { _ in
+                self.dismiss(animated: true)
+            })
+        } else {
+           act = UIAlertAction(title: "OK!", style: .cancel)
+
+        }
+        alert.addAction(act)
         present(alert, animated: true)
-        
     }
     func configViews(){
         view.addSubview(logoImgView)

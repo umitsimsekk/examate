@@ -15,6 +15,7 @@ protocol LoginViewModelInterface {
 
     func viewDidLoad()
     func viewDidLayoutSubviews()
+    func viewWillAppear()
 }
 
 class LoginViewModel {
@@ -25,8 +26,21 @@ class LoginViewModel {
 }
 
 extension LoginViewModel : LoginViewModelInterface {
+   
     func login(user: User) {
-        
+        auth.signIn(withEmail: user.email, password: user.password) { success in
+            if success {
+                self.view?.showAlert(title: "Success", message: "User successfuly signed in",action: true)
+            }else {
+                self.view?.showAlert(title: "Error", message: "User not signed in",action: false)
+            }
+        }
+    }
+    func checkLogin() {
+        guard let user = FirebaseAuth.Auth.auth().currentUser else {
+            return
+        }
+        view?.showMainTabbar()
     }
     func viewDidLoad() {
         view?.addTarget()
@@ -35,6 +49,9 @@ extension LoginViewModel : LoginViewModelInterface {
     
     func viewDidLayoutSubviews() {
         view?.setFrames()
+    }
+    func viewWillAppear() {
+        checkLogin()
     }
 
 }

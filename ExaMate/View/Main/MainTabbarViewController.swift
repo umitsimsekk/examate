@@ -7,23 +7,32 @@
 
 import UIKit
 
-class MainTabbarViewController: UIViewController {
+class MainTabbarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        let vc1 = UINavigationController(rootViewController: FeedViewController())
+        let vc2 = UINavigationController(rootViewController: ChatViewController())
+        let vc3 = UINavigationController(rootViewController: GroupsViewController())
+        let vc4 = UINavigationController(rootViewController: PrivateViewController())
+        
+        vc1.title  = "Soru Odaları"
+        vc2.title  = "Sohbet Odaları"
+        vc3.title  = "Gruplar"
+        vc4.title  = "Özel"
+        
+        vc1.tabBarItem.image = UIImage(systemName: "questionmark.app")
+        vc2.tabBarItem.image = UIImage(systemName: "message")
+        vc3.tabBarItem.image = UIImage(systemName: "person.3")
+        vc4.tabBarItem.image = UIImage(systemName: "person")
+        
+        view.tintColor = .label
+        
+        setViewControllers([vc1,vc2,vc3,vc4], animated: true)
+        
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

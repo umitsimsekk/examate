@@ -11,9 +11,11 @@ import FirebaseAuth
 protocol LoginViewControllerInterface : AnyObject {
     func didTapSignUpButton()
     func didTapLoginButton()
+    func showAlert(title: String, message: String,action: Bool)
     func configViews()
     func addTarget()
     func setFrames()
+    func showMainTabbar()
 }
 class LoginViewController: UIViewController{
     var user: User?
@@ -149,19 +151,26 @@ class LoginViewController: UIViewController{
         super.viewDidLayoutSubviews()
         viewModel.viewDidLayoutSubviews()
     }
-}
-extension LoginViewController {
-    
-    func showAlert(title : String, message : String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK!", style: .cancel)
-        alert.addAction(action)
-        present(alert, animated: true)
-        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.viewWillAppear()
     }
-    
 }
+
 extension LoginViewController : LoginViewControllerInterface {
+    func showAlert(title: String, message: String,action: Bool) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let act : UIAlertAction
+        if action {
+            act = UIAlertAction(title: "OK!", style: .cancel, handler: { _ in
+                self.showMainTabbar()
+            })
+        } else {
+            act = UIAlertAction(title: "OK!", style: .cancel)
+        }
+        alert.addAction(act)
+        present(alert, animated: true)
+    }
     func setFrames(){
         let logoWidth : CGFloat = 200
         logoImgView.frame = CGRect(x: 10,
@@ -240,13 +249,17 @@ extension LoginViewController : LoginViewControllerInterface {
     @objc func didTapLoginButton() {
         guard let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
-            self.showAlert(title: "Error!", message: "Fill in your information to sign in")
+            self.showAlert(title: "Error!", message: "Fill in your information to sign in",action: false)
             return
         }
         user = User(username: "", email: email, password: password)
         viewModel.login(user: user!)
     }
-    
+    func showMainTabbar() {
+        let vc = MainTabbarViewController()
+        vc.modalPresentationStyle = .fullScreen
+        navigationController?.present(vc, animated: true)
+    }
 }
 
 

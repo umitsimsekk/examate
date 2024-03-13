@@ -17,12 +17,20 @@ protocol DatabaseManagerProtocol {
     
     //User
     func insertUser(model user : User, completion: @escaping(Bool)->Void)
-    
+    func getUsername(email : String, completion:@escaping(String)->Void)
     
     
     //Post
     func insertPost(model post : Post,completion: @escaping(Bool)->Void)
     func getAllPost(completion: @escaping(Result<[Post],DataError>)->Void)
+    
+    
+    
+    //Profile
+    func getUserProfilePhoto(email: String ,completion : @escaping(URL?)->Void)
+    
+    //Comment
+    func getCommentsCount(postId : String, completion: @escaping(Int)->Void)
 }
 
 class DatabaseManager : DatabaseManagerProtocol {
@@ -44,6 +52,14 @@ class DatabaseManager : DatabaseManagerProtocol {
                 return
             }
             completion(true)
+        }
+    }
+    func getUsername(email : String, completion:@escaping(String)->Void) {
+        database.collection("User").document(email).getDocument { documentSnapshot, error in
+            guard error == nil, let username = documentSnapshot?.get("username") as? String else {
+                return
+            }
+            completion(username)
         }
     }
     
@@ -97,5 +113,34 @@ class DatabaseManager : DatabaseManagerProtocol {
         }
     }
     
+    func getUserProfilePhoto(email: String ,completion : @escaping(URL?)->Void) {
+        database.collection("Profile").document(email).getDocument { documentsnaps, error in
+            guard error == nil,
+                  let profileImgUrl = documentsnaps?.get("profileImgUrl") as? String,
+                  let url = URL(string: profileImgUrl) else {
+                completion(nil)
+                return
+            }
+            completion(url)
+        }
+    }
     
+    func getCommentsCount(postId : String, completion: @escaping(Int)->Void) {
+        var output = 0
+        database.collection("Comment").getDocuments { querySnapshot, error in
+            guard error == nil, let documents = querySnapshot?.documents else {
+                completion(0)
+                return
+            }
+            for document in documents {
+                guard let commentPostId = document.get("postId") as? String else {return }
+                
+                if commentPostId == postId {
+                    output += 1
+                }
+            }
+            completion(output)
+        }
+    }
+
 }

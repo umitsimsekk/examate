@@ -106,12 +106,18 @@ extension FeedTableViewCell {
         contentView.addSubview(answerLabel)
     }
     
-    public func configure(with model : Post) {
-        
-        self.questionTextLabel.text = model.question
-        self.lessonNameLabel.text = model.lesson        
-        guard let url = model.imgUrl else { return }
-        
+    public func configure(with model : FeedCell) {
+        self.questionTextLabel.text = model.post.question
+        self.lessonNameLabel.text = model.post.lesson
+        guard let url = model.post.imgUrl else { return }
+        self.postImgView.sd_setImage(with: url)
+        self.usernameLabel.text = model.username
+        if model.commentCount == 0 {
+            self.answerLabel.text = "Henüz yanıt yok"
+        } else {
+            self.answerLabel.text = "\(model.commentCount) yanıt"
+        }
+        self.profileImgView.sd_setImage(with: model.profilePhoto)
     }
     
 }

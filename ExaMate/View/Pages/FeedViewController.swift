@@ -5,6 +5,7 @@
 //  Created by Ümit Şimşek on 4.03.2024.
 //
 import UIKit
+
 protocol FeedViewControllerInterface : AnyObject {
     func prepareButtonAction()
     func tableViewFrame()
@@ -32,12 +33,8 @@ class FeedViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         viewModel.view = self
         viewModel.viewDidLoad()
-
-        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

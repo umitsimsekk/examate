@@ -1,0 +1,263 @@
+//
+//  CommentViewController.swift
+//  ExamMate1
+//
+//  Created by Ümit Şimşek on 2.12.2023.
+//
+
+import UIKit
+import SDWebImage
+protocol CommentViewControllerInterface : AnyObject {
+    func setTableViewDelegates()
+    func configViews()
+    func viewwDidLayoutSubviews()
+    func showAlert(title: String, message: String)
+    func fetchComments()
+    var commentsTableView : UITableView { get set}
+}
+class CommentViewController: UIViewController {
+    lazy var viewModel = CommentViewModel()
+    var db = DatabaseManager()
+    var postId = ""
+    private let profileImgView : UIImageView = {
+       let imgView = UIImageView()
+        let img = UIImage(systemName: "person.circle")
+        imgView.image = img
+        
+        imgView.layer.cornerRadius = 25
+        imgView.contentMode = .scaleAspectFill
+        imgView.clipsToBounds = true
+      return imgView
+    }()
+    
+    private let usernameLabel : UILabel = {
+       let lbl = UILabel()
+        lbl.clipsToBounds = true
+        lbl.text = "Username"
+        lbl.textColor = .label
+        return lbl
+    }()
+    
+    private let lessonNameLabel : UILabel  = {
+        let lbl = UILabel()
+         lbl.clipsToBounds = true
+         lbl.textAlignment = .right
+         lbl.textColor = .label
+         lbl.text = "TYT Matematik"
+         return lbl
+    }()
+    private let questionTextLabel : UILabel  = {
+        let lbl = UILabel()
+         lbl.clipsToBounds = true
+         lbl.text = "Soru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecekSoru böyle gözükecek"
+        lbl.numberOfLines = 0
+         return lbl
+    }()
+    
+    private let postImgView : UIImageView = {
+        let imgView = UIImageView()
+         let img = UIImage(systemName: "photo")
+         imgView.image = img
+         imgView.clipsToBounds = true
+         imgView.contentMode = .scaleAspectFill
+         return imgView
+    }()
+    
+    private let answerLabel : UILabel  = {
+        let lbl = UILabel()
+         lbl.clipsToBounds = true
+         lbl.text = "12 Yanıt"
+         return lbl
+    }()
+    
+     var commentsTableView : UITableView = {
+        let tableView = UITableView()
+        tableView.register(CommentTableViewCell.self, forCellReuseIdentifier: CommentTableViewCell.identifier)
+         return tableView
+    }()
+    
+    private let commentUIView : UIView = {
+       let vieww = UIView()
+        vieww.backgroundColor = .systemGray3
+        vieww.layer.cornerRadius = 12
+        
+        return vieww
+        
+    }()
+    
+    private let messageTextField : UITextField = {
+       let txtField = UITextField()
+        txtField.placeholder = "Enter message..."
+        txtField.clipsToBounds = true
+        txtField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 50))
+        txtField.leftViewMode = .always
+        
+        txtField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 50))
+        txtField.rightViewMode = .always
+        
+        txtField.layer.cornerRadius = 4
+        txtField.backgroundColor = .systemGray6
+        
+        txtField.autocorrectionType = .no
+        txtField.autocapitalizationType = .none
+        return txtField
+    }()
+
+    private let sendUIView : UIView = {
+       let vieww = UIView()
+        vieww.backgroundColor = .systemGray6
+        vieww.layer.cornerRadius = 12
+        return vieww
+        
+    }()
+    
+    private let sendButtonImgView : UIImageView = {
+        let imgView = UIImageView()
+        let img = UIImage(systemName: "paperplane.fill")
+        imgView.image = img
+        imgView.clipsToBounds = true
+        imgView.contentMode = .scaleAspectFill
+        return imgView
+    }()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        viewModel.view = self
+        viewModel.viewDidLoad()
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapSendButton))
+        self.sendButtonImgView.isUserInteractionEnabled = true
+        self.sendButtonImgView.addGestureRecognizer(gestureRecognizer)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        viewModel.viewDidLayoutSubviews()
+    }
+ 
+}
+extension CommentViewController : UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        viewModel.numberRowsInSection()
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        viewModel.cellForRow(tableView, cellForRowAt: indexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        80
+    }
+}
+
+extension CommentViewController : CommentViewControllerInterface {
+    
+    
+    func fetchComments() {
+        viewModel.getCommentsByPostId(postId: postId)
+    }
+    
+    func showAlert(title: String, message: String) {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK!", style: .cancel)
+            alert.addAction(action)
+            present(alert, animated: true)
+        self.messageTextField.text = ""
+        
+    }
+    
+    @objc func didTapSendButton() {
+        guard let message = messageTextField.text, !message.isEmpty,
+              self.postId != ""
+        else {
+            return
+        }
+        let comment = Comment(postId: postId,
+                              commentId: "",
+                              commentBy: "",
+                              commentText: message,
+                              timestamp: Date().timeIntervalSince1970)
+        self.viewModel.insertComment(comment: comment)
+    }
+    func setTableViewDelegates() {
+        self.commentsTableView.dataSource = self
+        self.commentsTableView.delegate = self
+    }
+    func configViews() {
+        view.addSubview(profileImgView)
+        view.addSubview(usernameLabel)
+        view.addSubview(lessonNameLabel)
+        view.addSubview(questionTextLabel)
+        view.addSubview(postImgView)
+        view.addSubview(answerLabel)
+        view.addSubview(commentsTableView)
+        
+        commentUIView.addSubview(messageTextField)
+        sendUIView.addSubview(sendButtonImgView)
+        commentUIView.addSubview(sendUIView)
+        view.addSubview(commentUIView)
+    }
+    func configure(with model : Post) {
+        self.questionTextLabel.text = model.question
+        self.lessonNameLabel.text = model.lesson
+        self.answerLabel.text = model.answer
+        guard let url = model.imgUrl else { return }
+        
+        self.postImgView.sd_setImage(with: url)
+        db.getUsername(email: model.postedBy) { usern in
+            self.usernameLabel.text = usern
+        }
+        self.postId = model.postId
+        
+        db.getUserProfilePhoto(email:model.postedBy) { url in
+            guard let imgUrl =  url else {return }
+            self.profileImgView.sd_setImage(with: url)
+        }
+    }
+    
+    func viewwDidLayoutSubviews(){
+        profileImgView.frame = CGRect(x: 10,
+                                      y: view.safeAreaInsets.top+20,
+                                      width: 50,
+                                      height: 50)
+        usernameLabel.frame = CGRect(x: profileImgView.right+10,
+                                      y: view.safeAreaInsets.top+20,
+                                      width: 100,
+                                      height: 50)
+        lessonNameLabel.frame = CGRect(x: (view.width-150),
+                                       y: view.safeAreaInsets.top+20,
+                                       width: 150,
+                                       height: 50)
+        questionTextLabel.frame = CGRect(x: 10,
+                                         y: profileImgView.bottom,
+                                         width: view.width-20,
+                                         height: 70)
+        postImgView.frame = CGRect(x: 10,
+                                   y:questionTextLabel.bottom+10,
+                                         width: view.width-20,
+                                         height: 200)
+        answerLabel.frame = CGRect(x: 10,
+                                   y:postImgView.bottom+10,
+                                         width: view.width-20,
+                                         height: 20)
+        commentsTableView.frame = CGRect(x: 10,
+                                        y:answerLabel.bottom+10,
+                                              width: view.width-20,
+                                              height: 200)
+        commentUIView.frame = CGRect(x: 0,
+                                     y:view.bottom-150,
+                                              width: view.width,
+                                              height: 70)
+        messageTextField.frame = CGRect(x: 10,
+                                        y:10,
+                                        width: commentUIView.width-80,
+                                              height: 50)
+        sendUIView.frame = CGRect(x: commentUIView.right-60,
+                                     y:10,
+                                              width: 50,
+                                              height: 50)
+        sendButtonImgView.frame = CGRect(x: 10,
+                                     y:10,
+                                              width: 30,
+                                              height: 30)
+    }
+}

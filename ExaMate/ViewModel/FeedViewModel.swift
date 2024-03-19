@@ -28,43 +28,23 @@ class FeedViewModel {
    weak var view: FeedViewControllerInterface?
     var database : DatabaseManagerProtocol = DatabaseManager()
     var posts: [Post]?
-    var url : URL?
-    var count : Int?
-    var username : String?
+
 }
 
 extension FeedViewModel : FeedViewModelInterface {
    
     func fetchData() {
-        database.getAllPost(completion: { results in
+        database.getAllPost(completion: {[weak self] results in
             switch results {
             case .success(let post):
-                self.posts = post
+                self?.posts = post
                 DispatchQueue.main.async {
-                    self.view?.feedTableView.reloadData()
+                    self?.view?.feedTableView.reloadData()
                 }
             case .failure(let error):
                 print(error)
             }
         })
-    }
-    func getProfilePhotoUrl(email : String) {
-        database.getUserProfilePhoto(email: email) { url in
-            guard let urlString = url else {return }
-            self.url = urlString
-            
-        }
-    }
-    func getUsername(email: String) {
-        database.getUsername(email: email) { username in
-            self.username = username
-        }
-    }
-    
-    func getCommentsCount(postId: String) {
-        database.getCommentsCount(postId: postId) { count in
-            self.count = count
-        }
     }
    
     func viewDidLoad() {
@@ -109,7 +89,12 @@ extension FeedViewModel : FeedViewModelInterface {
     }
     
     func didSelectItem(at indexPath: IndexPath) -> UIViewController {
-      UIViewController()
+        guard let posts = posts else { return UIViewController() }
+        let post = posts[indexPath.row]
+        let vc = CommentViewController(post: post)
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.title = "Post"
+        return vc
     }
     
     

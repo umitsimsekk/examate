@@ -9,7 +9,6 @@ import UIKit
 
 class CommentTableViewCell: UITableViewCell {
     static let identifier = "CommentTableViewCell"
-    var db = DatabaseManager()
 
     private let profileImgView : UIImageView = {
        let imgView = UIImageView()
@@ -76,8 +75,8 @@ extension CommentTableViewCell {
        
     }
     
-    public func configure(with model : Comment) {
-        self.commentTextLabel.text = model.commentText
+    public func configure() {
+      /*  self.commentTextLabel.text = model.commentText
         db.getUsername(email: model.commentBy) { usern in
             self.usernameLabel.text = usern
         }
@@ -85,6 +84,7 @@ extension CommentTableViewCell {
             guard let imgUrl = url else {return }
             self.profileImgView.sd_setImage(with: imgUrl)
         }
+       */
     }
     
 }

@@ -10,15 +10,17 @@ import SDWebImage
 protocol CommentViewControllerInterface : AnyObject {
     func setTableViewDelegates()
     func configViews()
-    func viewwDidLayoutSubviews()
+    func configure(with model : FeedCell)
+    func setFrames()
     func showAlert(title: String, message: String)
     func fetchComments()
     var commentsTableView : UITableView { get set}
+    func addTarget()
 }
 class CommentViewController: UIViewController {
-    lazy var viewModel = CommentViewModel()
-    var db = DatabaseManager()
     var postId = ""
+    var post : Post
+    lazy var viewModel = CommentViewModel()
     private let profileImgView : UIImageView = {
        let imgView = UIImageView()
         let img = UIImage(systemName: "person.circle")
@@ -119,14 +121,21 @@ class CommentViewController: UIViewController {
         imgView.contentMode = .scaleAspectFill
         return imgView
     }()
+    init(post: Post) {
+        self.post = post
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.getFeedCell(post: post)
+        
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         viewModel.view = self
         viewModel.viewDidLoad()
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapSendButton))
-        self.sendButtonImgView.isUserInteractionEnabled = true
-        self.sendButtonImgView.addGestureRecognizer(gestureRecognizer)
+       
     }
     
     override func viewDidLayoutSubviews() {
@@ -151,7 +160,11 @@ extension CommentViewController : UITableViewDelegate, UITableViewDataSource {
 
 extension CommentViewController : CommentViewControllerInterface {
     
-    
+    func addTarget() {
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapSendButton))
+        self.sendButtonImgView.isUserInteractionEnabled = true
+        self.sendButtonImgView.addGestureRecognizer(gestureRecognizer)
+    }
     func fetchComments() {
         viewModel.getCommentsByPostId(postId: postId)
     }
@@ -196,25 +209,22 @@ extension CommentViewController : CommentViewControllerInterface {
         commentUIView.addSubview(sendUIView)
         view.addSubview(commentUIView)
     }
-    func configure(with model : Post) {
-        self.questionTextLabel.text = model.question
-        self.lessonNameLabel.text = model.lesson
-        self.answerLabel.text = model.answer
-        guard let url = model.imgUrl else { return }
+    func configure(with model : FeedCell) {
+        self.questionTextLabel.text = model.post.question
+        self.lessonNameLabel.text = model.post.lesson
+        self.answerLabel.text = model.post.answer
+        guard let url = model.post.imgUrl else { return }
         
         self.postImgView.sd_setImage(with: url)
-        db.getUsername(email: model.postedBy) { usern in
-            self.usernameLabel.text = usern
-        }
-        self.postId = model.postId
+       
+        self.postId = model.post.postId
         
-        db.getUserProfilePhoto(email:model.postedBy) { url in
-            guard let imgUrl =  url else {return }
-            self.profileImgView.sd_setImage(with: url)
-        }
+        self.usernameLabel.text = model.username
+        
+        
     }
     
-    func viewwDidLayoutSubviews(){
+    func setFrames(){
         profileImgView.frame = CGRect(x: 10,
                                       y: view.safeAreaInsets.top+20,
                                       width: 50,
@@ -260,4 +270,5 @@ extension CommentViewController : CommentViewControllerInterface {
                                               width: 30,
                                               height: 30)
     }
+    
 }

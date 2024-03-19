@@ -5,4 +5,107 @@
 //  Created by Ümit Şimşek on 14.03.2024.
 //
 
-import Foundation
+import UIKit
+protocol CommentViewModelInterface {
+    var view : CommentViewControllerInterface?{ get set}
+    var database : DatabaseManagerProtocol { get}
+    var auth : AuthManagerProtocol {get}
+    
+    
+    func viewDidLoad()
+    func viewDidLayoutSubviews()
+    func viewWillAppear()
+    func numberRowsInSection() -> Int
+    func cellForRow(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
+    func getFeedCell(post: Post)
+
+}
+
+class CommentViewModel {
+    weak var view: CommentViewControllerInterface?
+    var database: DatabaseManagerProtocol = DatabaseManager()
+    var auth: AuthManagerProtocol = AuthManager()
+    var comments: [Comment]?
+    
+    func getCommentsByPostId(postId: String) {
+        database.getCommentByPostId(postId: postId) { results in
+            switch results {
+            case .success(let comments):
+                self.comments = comments
+                DispatchQueue.main.async {
+                    self.view?.commentsTableView.reloadData()
+                }
+            case .failure(let error):
+                print(error)
+
+            }
+        }
+    }
+   
+    func insertComment(comment: Comment) {
+        let commentId = UUID().uuidString
+        let commentBy = auth.getCurrentUserEmail()
+        let comment = Comment(postId: comment.postId,
+                              commentId: commentId,
+                              commentBy: commentBy,
+                              commentText: comment.commentText,
+                              timestamp: comment.timestamp)
+        database.insertComment(model: comment) { success in
+            if success {
+                self.view?.showAlert(title: "Success", message: "Comment maked")
+            } else {
+                self.view?.showAlert(title: "Error", message: "Comment error")
+
+            }
+        }
+    }
+}
+
+extension CommentViewModel : CommentViewModelInterface {
+    func getFeedCell(post: Post) {
+        var feedCell = FeedCell(post: post, profilePhoto: nil, commentCount: 0, username: "")
+        database.getUserProfilePhoto(email: post.postedBy) { [weak self] url in
+            if let urlString = url {
+                feedCell.profilePhoto = urlString
+            }
+            self?.database.getCommentsCount(postId: post.postId) { count in
+                feedCell.commentCount = count
+                
+                self?.database.getUsername(email: post.postedBy) { username in
+                    feedCell.username = username
+                    self?.view?.configure(with: feedCell)
+                }
+            }
+            
+        }
+    }
+    
+    func cellForRow(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CommentTableViewCell.identifier, for: indexPath) as? CommentTableViewCell else {
+            return UITableViewCell()
+        }
+        let comment = self.comments![indexPath.row]
+        cell.configure()
+        return cell
+    }
+    
+    func viewDidLoad() {
+        view?.configViews()
+        view?.setTableViewDelegates()
+        view?.fetchComments()
+    }
+    
+    func viewDidLayoutSubviews() {
+        view?.setFrames()
+    }
+    
+    func viewWillAppear() {
+        view?.fetchComments()
+    }
+    
+    func numberRowsInSection() -> Int {
+        comments?.count ?? 0
+    }
+    
+    
+}

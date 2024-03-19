@@ -31,6 +31,11 @@ protocol DatabaseManagerProtocol {
     
     //Comment
     func getCommentsCount(postId : String, completion: @escaping(Int)->Void)
+    func getCommentByPostId(postId: String,completion:@escaping(Result<[Comment], DataError>)->Void)
+    func insertComment(model comment : Comment, completion: @escaping(Bool) -> Void)
+    
+    //Other
+    func getFeedCell(model post: Post, completion: @escaping(FeedCell) -> Void)
 }
 
 class DatabaseManager : DatabaseManagerProtocol {
@@ -142,5 +147,82 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(output)
         }
     }
-
+    func getCommentByPostId(postId: String,completion:@escaping(Result<[Comment], DataError>)->Void) {
+        var comments = [Comment]()
+        database.collection("Comment").order(by: "created").getDocuments { querySnapshot, error in
+            guard error == nil, let documents = querySnapshot?.documents else {
+                completion(.failure(.fetchCommentError))
+                return
+            }
+            for document in documents {
+                guard let commentBy = document["commentBy"] as? String,
+                      let commentId = document["commentId"] as? String,
+                      let commentText = document["commentText"] as? String,
+                      let postId = document["postId"] as? String,
+                      let created = document["created"] as? TimeInterval
+                else {
+                    print("Invalid fetch comments")
+                    return
+                }
+                let comment = Comment(postId: postId, commentId: commentId, commentBy: commentBy, commentText: commentText, timestamp: created)
+                comments.append(comment)
+            }
+            let newComs = comments.filter { comment in
+                return comment.postId == postId
+            }
+            completion(.success(newComs))
+        }
+    }
+    func insertComment(model comment : Comment, completion: @escaping(Bool) -> Void) {
+        guard let data = [
+            "commentBy" : comment.commentBy,
+            "postId" : comment.postId,
+            "commentId" : comment.commentId,
+            "commentText" : comment.commentText,
+            "created" : comment.timestamp
+        ] as? [String : Any] else {
+            completion(false)
+            return
+        }
+        database.collection("Comment").document(comment.commentId).setData(data) { error in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    
+    func getFeedCell(model post: Post, completion: @escaping(FeedCell) -> Void) {
+        var count = 0
+        database.collection("Profile").document(post.postedBy).getDocument { documentsnaps, error in
+            guard error == nil,
+                  let profileImgUrl = documentsnaps?.get("profileImgUrl") as? String,
+                  let url = URL(string: profileImgUrl) else {
+                return
+            }
+            self.database.collection("Comment").getDocuments { querySnapshot, error in
+                guard error == nil, let documents = querySnapshot?.documents else {
+                    return
+                }
+                for document in documents {
+                    guard let commentPostId = document.get("postId") as? String else {return }
+                    
+                    if commentPostId == post.postId {
+                        count += 1
+                    }
+                }
+                self.database.collection("User").document(post.postedBy).getDocument { documentSnapshot, error in
+                    guard error == nil, let username = documentSnapshot?.get("username") as? String else {
+                        return
+                    }
+                    let feedCell = FeedCell(post: post, profilePhoto: url, commentCount: count, username: username)
+                    completion(feedCell)
+                    print(feedCell)
+                }
+                
+            }
+            
+        }
+    }
 }

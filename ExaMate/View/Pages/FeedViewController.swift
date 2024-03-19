@@ -79,7 +79,6 @@ extension FeedViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let vc = viewModel.didSelectItem(at: indexPath)
-        
         navigationController?.pushViewController(vc, animated: true)
         
     }

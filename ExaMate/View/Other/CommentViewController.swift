@@ -21,6 +21,11 @@ class CommentViewController: UIViewController {
     var postId = ""
     var post : Post
     lazy var viewModel = CommentViewModel()
+    private let scrollView : UIScrollView = {
+       let vieww = UIScrollView()
+        vieww.backgroundColor = .green
+        return vieww
+    }()
     private let profileImgView : UIImageView = {
        let imgView = UIImageView()
         let img = UIImage(systemName: "person.circle")
@@ -146,11 +151,15 @@ class CommentViewController: UIViewController {
 }
 extension CommentViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.numberRowsInSection()
+        //viewModel.numberRowsInSection()
+        return 20
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        viewModel.cellForRow(tableView, cellForRowAt: indexPath)
+        //viewModel.cellForRow(tableView, cellForRowAt: indexPath)
+        let cell = UITableViewCell()
+        cell.textLabel?.text = "TEXT"
+        return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -196,18 +205,20 @@ extension CommentViewController : CommentViewControllerInterface {
         self.commentsTableView.delegate = self
     }
     func configViews() {
-        view.addSubview(profileImgView)
-        view.addSubview(usernameLabel)
-        view.addSubview(lessonNameLabel)
-        view.addSubview(questionTextLabel)
-        view.addSubview(postImgView)
-        view.addSubview(answerLabel)
-        view.addSubview(commentsTableView)
+        scrollView.addSubview(profileImgView)
+        scrollView.addSubview(usernameLabel)
+        scrollView.addSubview(lessonNameLabel)
+        scrollView.addSubview(questionTextLabel)
+        scrollView.addSubview(postImgView)
+        scrollView.addSubview(answerLabel)
+        scrollView.addSubview(commentsTableView)
         
         commentUIView.addSubview(messageTextField)
         sendUIView.addSubview(sendButtonImgView)
         commentUIView.addSubview(sendUIView)
-        view.addSubview(commentUIView)
+        scrollView.addSubview(commentUIView)
+        
+        view.addSubview(scrollView)
     }
     func configure(with model : FeedCell) {
         self.questionTextLabel.text = model.post.question
@@ -225,16 +236,22 @@ extension CommentViewController : CommentViewControllerInterface {
     }
     
     func setFrames(){
+        scrollView.contentSize = CGSize(width: view.width, height: 2000)
+        scrollView.frame = CGRect(x: 0,
+                                  y: 0,
+                                  width: view.width,
+                                  height: view.height)
+        
         profileImgView.frame = CGRect(x: 10,
-                                      y: view.safeAreaInsets.top+20,
+                                      y: scrollView.top+10,
                                       width: 50,
                                       height: 50)
         usernameLabel.frame = CGRect(x: profileImgView.right+10,
-                                      y: view.safeAreaInsets.top+20,
+                                      y: scrollView.top+10,
                                       width: 100,
                                       height: 50)
         lessonNameLabel.frame = CGRect(x: (view.width-150),
-                                       y: view.safeAreaInsets.top+20,
+                                       y: scrollView.top+10,
                                        width: 150,
                                        height: 50)
         questionTextLabel.frame = CGRect(x: 10,
@@ -252,7 +269,7 @@ extension CommentViewController : CommentViewControllerInterface {
         commentsTableView.frame = CGRect(x: 10,
                                         y:answerLabel.bottom+10,
                                               width: view.width-20,
-                                              height: 200)
+                                         height: scrollView.height-20)
         commentUIView.frame = CGRect(x: 0,
                                      y:view.bottom-150,
                                               width: view.width,

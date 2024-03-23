@@ -20,6 +20,12 @@ protocol CommentViewModelInterface {
     func getFeedCell(post: Post)
 
 }
+struct CommentCell {
+    var text : String
+    var username : String
+    var profilePhoto : URL?
+
+}
 
 class CommentViewModel {
     weak var view: CommentViewControllerInterface?
@@ -32,6 +38,7 @@ class CommentViewModel {
             switch results {
             case .success(let comments):
                 self.comments = comments
+                print(comments)
                 DispatchQueue.main.async {
                     self.view?.commentsTableView.reloadData()
                 }
@@ -85,7 +92,16 @@ extension CommentViewModel : CommentViewModelInterface {
             return UITableViewCell()
         }
         let comment = self.comments![indexPath.row]
-        cell.configure()
+        var commentCell = CommentCell(text: "", username: "", profilePhoto: nil)
+        database.getUserProfilePhoto(email: comment.commentBy) {[weak self] url in
+            if let urlString = url {
+                commentCell.profilePhoto = urlString
+            }
+            self?.database.getUsername(email: comment.commentBy) { username in
+                commentCell.username = username
+                cell.configure(comment: commentCell)
+            }
+        }
         return cell
     }
     
@@ -93,6 +109,7 @@ extension CommentViewModel : CommentViewModelInterface {
         view?.configViews()
         view?.setTableViewDelegates()
         view?.fetchComments()
+        view?.addTarget()
     }
     
     func viewDidLayoutSubviews() {

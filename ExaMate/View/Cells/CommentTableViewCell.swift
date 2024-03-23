@@ -75,16 +75,12 @@ extension CommentTableViewCell {
        
     }
     
-    public func configure() {
-      /*  self.commentTextLabel.text = model.commentText
-        db.getUsername(email: model.commentBy) { usern in
-            self.usernameLabel.text = usern
-        }
-        db.getUserProfilePhoto(email: model.commentBy) { url in
-            guard let imgUrl = url else {return }
-            self.profileImgView.sd_setImage(with: imgUrl)
-        }
-       */
+    public func configure(comment model : CommentCell) {
+        self.commentTextLabel.text = model.text
+        self.usernameLabel.text = model.username
+        
+        guard let imgUrl = model.profilePhoto else {return }
+        self.profileImgView.sd_setImage(with: imgUrl)        
     }
     
 }

@@ -23,7 +23,7 @@ class CommentViewController: UIViewController {
     lazy var viewModel = CommentViewModel()
     private let scrollView : UIScrollView = {
        let vieww = UIScrollView()
-        vieww.backgroundColor = .green
+        vieww.backgroundColor = .systemBackground
         return vieww
     }()
     private let profileImgView : UIImageView = {
@@ -151,15 +151,11 @@ class CommentViewController: UIViewController {
 }
 extension CommentViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //viewModel.numberRowsInSection()
-        return 20
+        viewModel.numberRowsInSection()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //viewModel.cellForRow(tableView, cellForRowAt: indexPath)
-        let cell = UITableViewCell()
-        cell.textLabel?.text = "TEXT"
-        return cell
+        viewModel.cellForRow(tableView, cellForRowAt: indexPath)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -188,9 +184,11 @@ extension CommentViewController : CommentViewControllerInterface {
     }
     
     @objc func didTapSendButton() {
+        print("did tap send")
         guard let message = messageTextField.text, !message.isEmpty,
               self.postId != ""
         else {
+            self.showAlert(title: "Error!", message: "Message can't be empty...")
             return
         }
         let comment = Comment(postId: postId,
@@ -199,6 +197,7 @@ extension CommentViewController : CommentViewControllerInterface {
                               commentText: message,
                               timestamp: Date().timeIntervalSince1970)
         self.viewModel.insertComment(comment: comment)
+    
     }
     func setTableViewDelegates() {
         self.commentsTableView.dataSource = self
@@ -236,7 +235,7 @@ extension CommentViewController : CommentViewControllerInterface {
     }
     
     func setFrames(){
-        scrollView.contentSize = CGSize(width: view.width, height: 2000)
+        scrollView.contentSize = CGSize(width: view.width, height: 900)
         scrollView.frame = CGRect(x: 0,
                                   y: 0,
                                   width: view.width,
@@ -269,9 +268,9 @@ extension CommentViewController : CommentViewControllerInterface {
         commentsTableView.frame = CGRect(x: 10,
                                         y:answerLabel.bottom+10,
                                               width: view.width-20,
-                                         height: scrollView.height-20)
+                                         height: (scrollView.height-20)/2)
         commentUIView.frame = CGRect(x: 0,
-                                     y:view.bottom-150,
+                                     y:commentsTableView.bottom+10,
                                               width: view.width,
                                               height: 70)
         messageTextField.frame = CGRect(x: 10,

@@ -171,6 +171,7 @@ extension CommentViewController : CommentViewControllerInterface {
         self.sendButtonImgView.addGestureRecognizer(gestureRecognizer)
     }
     func fetchComments() {
+        print(postId)
         viewModel.getCommentsByPostId(postId: postId)
     }
     
@@ -184,7 +185,6 @@ extension CommentViewController : CommentViewControllerInterface {
     }
     
     @objc func didTapSendButton() {
-        print("did tap send")
         guard let message = messageTextField.text, !message.isEmpty,
               self.postId != ""
         else {
@@ -230,6 +230,8 @@ extension CommentViewController : CommentViewControllerInterface {
         self.postId = model.post.postId
         
         self.usernameLabel.text = model.username
+        
+        fetchComments()
         
         
     }

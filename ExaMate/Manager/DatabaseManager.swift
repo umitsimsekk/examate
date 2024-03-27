@@ -170,8 +170,11 @@ class DatabaseManager : DatabaseManagerProtocol {
             let newComs = comments.filter { comment in
                 return comment.postId == postId
             }
+            print(newComs.count)
             completion(.success(newComs))
         }
+        
+
     }
     func insertComment(model comment : Comment, completion: @escaping(Bool) -> Void) {
         guard let data = [

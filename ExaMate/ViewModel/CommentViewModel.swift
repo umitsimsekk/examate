@@ -35,6 +35,7 @@ class CommentViewModel {
     
     func getCommentsByPostId(postId: String) {
         database.getCommentByPostId(postId: postId) { results in
+            print("vm postId:\(postId)")
             switch results {
             case .success(let comments):
                 self.comments = comments
@@ -92,7 +93,7 @@ extension CommentViewModel : CommentViewModelInterface {
             return UITableViewCell()
         }
         let comment = self.comments![indexPath.row]
-        var commentCell = CommentCell(text: "", username: "", profilePhoto: nil)
+        var commentCell = CommentCell(text: comment.commentText, username: "", profilePhoto: nil)
         database.getUserProfilePhoto(email: comment.commentBy) {[weak self] url in
             if let urlString = url {
                 commentCell.profilePhoto = urlString
@@ -108,7 +109,6 @@ extension CommentViewModel : CommentViewModelInterface {
     func viewDidLoad() {
         view?.configViews()
         view?.setTableViewDelegates()
-        view?.fetchComments()
         view?.addTarget()
     }
     
@@ -117,7 +117,6 @@ extension CommentViewModel : CommentViewModelInterface {
     }
     
     func viewWillAppear() {
-        view?.fetchComments()
     }
     
     func numberRowsInSection() -> Int {

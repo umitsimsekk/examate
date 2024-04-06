@@ -16,17 +16,21 @@ protocol CommentViewControllerInterface : AnyObject {
     func fetchComments()
     var commentsTableView : UITableView { get set}
     func addTarget()
+    var postImgView : UIImageView{get}
+    var profileImgView : UIImageView {get}
 }
 class CommentViewController: UIViewController {
     var postId = ""
     var post : Post
+    
     lazy var viewModel = CommentViewModel()
+    
     private let scrollView : UIScrollView = {
        let vieww = UIScrollView()
         vieww.backgroundColor = .systemBackground
         return vieww
     }()
-    private let profileImgView : UIImageView = {
+    var profileImgView : UIImageView = {
        let imgView = UIImageView()
         let img = UIImage(systemName: "person.circle")
         imgView.image = img
@@ -61,7 +65,7 @@ class CommentViewController: UIViewController {
          return lbl
     }()
     
-    private let postImgView : UIImageView = {
+    var postImgView : UIImageView = {
         let imgView = UIImageView()
          let img = UIImage(systemName: "photo")
          imgView.image = img
@@ -171,7 +175,6 @@ extension CommentViewController : CommentViewControllerInterface {
         self.sendButtonImgView.addGestureRecognizer(gestureRecognizer)
     }
     func fetchComments() {
-        print(postId)
         viewModel.getCommentsByPostId(postId: postId)
     }
     
@@ -223,12 +226,7 @@ extension CommentViewController : CommentViewControllerInterface {
         self.questionTextLabel.text = model.post.question
         self.lessonNameLabel.text = model.post.lesson
         self.answerLabel.text = model.post.answer
-        guard let url = model.post.imgUrl else { return }
-        
-        self.postImgView.sd_setImage(with: url)
-       
         self.postId = model.post.postId
-        
         self.usernameLabel.text = model.username
         
         fetchComments()

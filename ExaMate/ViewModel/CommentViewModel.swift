@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 protocol CommentViewModelInterface {
     var view : CommentViewControllerInterface?{ get set}
     var database : DatabaseManagerProtocol { get}
@@ -35,7 +36,6 @@ class CommentViewModel {
     
     func getCommentsByPostId(postId: String) {
         database.getCommentByPostId(postId: postId) { results in
-            print("vm postId:\(postId)")
             switch results {
             case .success(let comments):
                 self.comments = comments
@@ -75,12 +75,14 @@ extension CommentViewModel : CommentViewModelInterface {
         database.getUserProfilePhoto(email: post.postedBy) { [weak self] url in
             if let urlString = url {
                 feedCell.profilePhoto = urlString
+                self?.view?.profileImgView.sd_setImage(with:  urlString)
             }
             self?.database.getCommentsCount(postId: post.postId) { count in
                 feedCell.commentCount = count
                 
                 self?.database.getUsername(email: post.postedBy) { username in
                     feedCell.username = username
+                    self?.view?.postImgView.sd_setImage(with: post.imgUrl)
                     self?.view?.configure(with: feedCell)
                 }
             }

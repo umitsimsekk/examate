@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SettingsClassViewController: UIViewController,UITableViewDelegate, UITableViewDataSource{
+class SettingClassViewController: UIViewController,UITableViewDelegate, UITableViewDataSource{
     
     
     let lessons = [

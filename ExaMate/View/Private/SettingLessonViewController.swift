@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SettingsLessonViewController: UIViewController,UITableViewDelegate, UITableViewDataSource{
+class SettingLessonViewController: UIViewController,UITableViewDelegate, UITableViewDataSource{
     
     var selectedLessons = [Int]()
     let lessons = [

@@ -6,3 +6,11 @@
 //
 
 import Foundation
+struct Profile {
+    var profileImgUrl : URL
+    let username : String
+    let email : String
+    let password : String
+    let lessons : [String]
+    let grade : String
+}

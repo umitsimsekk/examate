@@ -7,10 +7,13 @@
 
 import FirebaseStorage
 protocol StorageManagerProtocol : AnyObject {
-    // post
+    // Post
     func uploadPostImage(email: String, postId : String ,image : UIImage, completion : @escaping(Bool)->Void)
     func downloadPostImageUrl(email : String, postId : String , completion : @escaping(URL?) -> Void)
     
+    // Setting
+    func uploadSettingsProfileImage(sender_email: String ,imageData : Data, completion : @escaping(Bool)->Void)
+    func downloadSettingsProfileImageUrl(sender_email : String,completion : @escaping(URL?) -> Void)
 }
 
 class StorageManager : StorageManagerProtocol {
@@ -39,5 +42,26 @@ class StorageManager : StorageManagerProtocol {
             completion(url)
         }
     }
+    //Settings
     
+    func uploadSettingsProfileImage(sender_email: String ,imageData : Data, completion : @escaping(Bool)->Void){
+        let path = "settings/\(sender_email)/\(sender_email).png"
+        storage.reference(withPath: path).putData(imageData) { metadata, error in
+            guard metadata != nil, error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    
+    func downloadSettingsProfileImageUrl(sender_email : String,completion : @escaping(URL?) -> Void){
+        let path = "settings/\(sender_email)/\(sender_email).png"
+        storage.reference(withPath: path).downloadURL { url, error in
+            guard url != nil , error == nil else {
+                return
+            }
+            completion(url)
+        }
+    }
 }

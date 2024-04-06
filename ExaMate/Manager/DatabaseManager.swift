@@ -18,6 +18,7 @@ protocol DatabaseManagerProtocol {
     //User
     func insertUser(model user : User, completion: @escaping(Bool)->Void)
     func getUsername(email : String, completion:@escaping(String)->Void)
+    func getUserInfo(email: String, completion: @escaping(Result<User,DataError>)->Void)
     
     
     //Post
@@ -28,6 +29,9 @@ protocol DatabaseManagerProtocol {
     
     //Profile
     func getUserProfilePhoto(email: String ,completion : @escaping(URL?)->Void)
+    func getUserProfileInfo(email: String ,completion : @escaping(Result<Profile,DataError>)->Void)
+    func insertProfileInfo(profile : Profile, completion: @escaping(Bool)->Void)
+
     
     //Comment
     func getCommentsCount(postId : String, completion: @escaping(Int)->Void)
@@ -65,6 +69,19 @@ class DatabaseManager : DatabaseManagerProtocol {
                 return
             }
             completion(username)
+        }
+    }
+    func getUserInfo(email: String, completion: @escaping(Result<User,DataError>)->Void) {
+        database.collection("User").document(email).getDocument { documentsnaps, error in
+            guard error == nil,
+                  let username = documentsnaps?.get("username") as? String,
+                  let email = documentsnaps?.get("email") as? String,
+                  let password = documentsnaps?.get("password") as? String else {
+                print("document error")
+                completion(.failure(.fetchUserError))
+                return
+            }
+            completion(.success(User(username: username, email: email, password: password)))
         }
     }
     
@@ -127,6 +144,41 @@ class DatabaseManager : DatabaseManagerProtocol {
                 return
             }
             completion(url)
+        }
+    }
+    func insertProfileInfo(profile : Profile, completion: @escaping(Bool)->Void) {
+       guard let data = [
+        "profileImgUrl" : profile.profileImgUrl.absoluteString,
+            "username": profile.username,
+            "email" : profile.email,
+            "password": profile.password,
+            "lessons" : profile.lessons,
+            "grade" : profile.grade
+
+       ] as? [String : Any] else {return }
+        database.collection("Profile").document("\(profile.email)").setData(data) { error in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    func getUserProfileInfo(email: String ,completion : @escaping(Result<Profile,DataError>)->Void) {
+        database.collection("Profile").document(email).getDocument { documentsnaps, error in
+            guard error == nil,
+                  let email = documentsnaps?.get("email") as? String,
+                  let grade = documentsnaps?.get("grade") as? String,
+                  let lessons = documentsnaps?.get("lessons") as? [String],
+                  let password = documentsnaps?.get("password") as? String,
+                  let profileImgUrl = documentsnaps?.get("profileImgUrl") as? String,
+                  let url = URL(string: profileImgUrl),
+                  let username = documentsnaps?.get("username") as? String else {
+                completion(.failure(.fetchChatError))
+                return
+            }
+            let profile = Profile(profileImgUrl: url, username: username, email: email, password: password, lessons: lessons, grade: grade)
+            completion(.success(profile))
         }
     }
     

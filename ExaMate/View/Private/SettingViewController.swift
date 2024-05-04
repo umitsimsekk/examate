@@ -325,10 +325,13 @@ extension SettingViewController {
               let imageData = profileImage.pngData(),
               let username = usernameTextField.text, !username.isEmpty,
               let email = emailTextField.text, !email.isEmpty,
-              let password = passwordTextField.text, !password.isEmpty,
-              let lessons = favoriteLessons as? [String], !lessons.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty else {
+            self.showAlert(title: "Error!", message: "Please fill all boxes to update profile info..")
+            return
+        }
+        guard let lessons = favoriteLessons as? [String], !lessons.isEmpty,
               let grade = classTextField.text, !grade.isEmpty else {
-            self.showAlert(title: "Error!", message: "Pleas fill all boxes to update profile info..")
+            self.showAlert(title: "Error!", message: "Nothing changed")
             return
         }
         let profile = Profile(profileImgUrl: URL(filePath: ""), username: username, email: email, password: password, lessons: lessons, grade: grade)

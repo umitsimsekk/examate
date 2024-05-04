@@ -2,7 +2,7 @@
 //  ChatTableViewCell.swift
 //  ExamMate1
 //
-//  Created by Ümit Şimşek on 29.12.2023.
+//
 //
 
 import UIKit
@@ -89,52 +89,7 @@ class ChatTableViewCell: UITableViewCell {
     public func configure(photo : String, name : String) {
         self.channelLogo.image = UIImage(named: photo)
         self.channelName.text = name
-        fetchInfoToChannel(channelName: name)
+        //fetchInfoToChannel(channelName: name)
 
-    }
-    
-    func fetchInfoToChannel(channelName : String) {
-        var message : Message?
-        DatabaseManager().getAllMessagesByChannelName(channelName: channelName) { result in
-            switch result {
-            case .success(let messages):
-                message = messages.last
-                guard message != nil  else {return }
-                DatabaseManager().getUsername(email: message!.sender.senderId) { username in
-                    var messg = ""
-                    
-                    switch message!.kind {
-                       
-                    case .text(let messageText):
-                        messg = messageText
-                    case .attributedText(_):
-                        break
-                    case .photo(_):
-                        break
-                    case .video(_):
-                        break
-                    case .location(_):
-                        break
-                    case .emoji(_):
-                        break
-                    case .audio(_):
-                        break
-                    case .contact(_):
-                        break
-                    case .linkPreview(_):
-                        break
-                    case .custom(_):
-                        break
-                    }
-                    self.content = messg
-                    self.senderUsername = username
-                    self.contentLabel.text = "\(self.senderUsername): \(self.content)"
-
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
-        
     }
 }

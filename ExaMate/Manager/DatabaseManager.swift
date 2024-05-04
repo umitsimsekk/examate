@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import MessageKit
 enum DataError : Error {
     case fetchPostError
     case fetchCommentError
@@ -40,6 +41,11 @@ protocol DatabaseManagerProtocol {
     
     //Other
     func getFeedCell(model post: Post, completion: @escaping(FeedCell) -> Void)
+    
+    
+    //Chat
+    func sendMessage(to chatChannel: String,username : String, model chat : Message, completion : @escaping(Bool) -> Void)
+    func getAllMessagesByChannelName(channelName : String, completion: @escaping(Result<[Message],DataError>)->Void)
 }
 
 class DatabaseManager : DatabaseManagerProtocol {
@@ -279,5 +285,119 @@ class DatabaseManager : DatabaseManagerProtocol {
             }
             
         }
+    }
+    //Chat
+    
+    func sendMessage(to chatChannel: String,username : String, model chat : Message, completion : @escaping(Bool) -> Void) {
+        guard let currentUserEmail = AuthManager().getCurrentUserEmail() as? String else {
+            completion(false)
+            return
+        }
+        let channelName = setChannelName(channelName: chatChannel)
+
+        var message = ""
+        
+        switch chat.kind {
+           
+        case .text(let messageText):
+            message = messageText
+        case .attributedText(_):
+            break
+        case .photo(let mediaItem):
+            if let urlString = mediaItem.url?.absoluteString {
+                message = urlString
+            }
+            break
+        case .video(_):
+            break
+        case .location(_):
+            break
+        case .emoji(_):
+            break
+        case .audio(_):
+            break
+        case .contact(_):
+            break
+        case .linkPreview(_):
+            break
+        case .custom(_):
+            break
+        }
+        let data : [ String : Any ] = [
+            "id" : chat.messageId,
+            "type" : chat.kind.messsageKindString,
+            "content" : message,
+            "date" : chat.sentDate,
+            "sender_email" : currentUserEmail,
+            "channel" : channelName,
+            "username" : username,
+            "is_read" : false
+        ]
+        database.collection("Chat").addDocument(data: data) { error in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    func setChannelName(channelName : String) -> String {
+        var name = channelName
+        if channelName == "TYT Kanalı" {
+            name = "tytkanali"
+        } else if channelName == "AYT Kanalı" {
+            name = "aytkanali"
+        } else {
+            name = "ydskanali"
+        }
+        return name
+    }
+    func getAllMessagesByChannelName(channelName : String, completion: @escaping(Result<[Message],DataError>)->Void) {
+      var messages = [Message]()
+      let name = setChannelName(channelName: channelName)
+        
+        database.collection("Chat").order(by: "date", descending: false).getDocuments { snapshot, error in
+            guard error == nil,let docs = snapshot?.documents else {
+                completion(.failure(.fetchChatError))
+                return
+            }
+            for doc in docs {
+                guard let content =  doc["content"] as? String,
+                      let id = doc["id"]  as? String,
+                      let type =  doc["type"]  as? String,
+                      let date = doc["date"] as? Timestamp,
+                      let sender_email = doc["sender_email"] as? String,
+                      let channel = doc["channel"] as? String,
+                      let username = doc["username"] as? String,
+                      let datee = date.dateValue() as? Date,
+                      let isRead = doc["is_read"]  as? Bool
+                else {
+                    completion(.failure(.fetchChatError))
+                    return
+                }
+                if channel == name {
+                    var kind : MessageKind?
+                    if type == "photo" {
+                        guard let url = URL(string: content) as? URL,
+                        let placeHolder = UIImage(systemName: "plus") else {
+                            return
+                        }
+                        let media = Media(url:url,placeholderImage: placeHolder, size: CGSize(width: 300, height: 300))
+                        
+                        kind = .photo(media)
+                    } else {
+                        kind = .text(content)
+                    }
+                    guard let finalKind = kind else {
+                        return
+                    }
+                    let sender = Sender(senderId: sender_email, displayName: username)
+                    let message = Message(sender: sender, messageId: id, sentDate: datee, kind: finalKind)
+                    messages.append(message)
+                }
+            }
+            completion(.success(messages))
+        }
+       
     }
 }

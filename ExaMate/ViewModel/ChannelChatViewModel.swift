@@ -59,6 +59,7 @@ protocol ChannelChatViewModelInterface{
     func viewWillAppear()
     func sendMessage(to channelName : String, model : Message)
     func fetchChannelMessage(channelName: String)
+    func getUserProfilePic(with email : String)
 }
 
 class ChannelChatViewModel {
@@ -69,6 +70,17 @@ class ChannelChatViewModel {
 
 
 extension ChannelChatViewModel : ChannelChatViewModelInterface {
+    func getUserProfilePic(with email: String){
+        database.getUserProfilePhoto(email: email) { [weak self] url in
+            let imgView = UIImageView()
+            guard let imgUrl = url else { return}
+            imgView.sd_setImage(with: imgUrl)
+            guard let avatar = Avatar(image: imgView.image) as? Avatar else {return }
+            self?.view?.avatar = avatar
+        }
+    }
+    
+ 
     func fetchChannelMessage(channelName: String) {
         database.getAllMessagesByChannelName(channelName: channelName) {[weak self] result in
             switch result {

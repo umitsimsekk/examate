@@ -8,9 +8,10 @@
 import UIKit
 import MessageKit
 import InputBarAccessoryView
-
+import SDWebImage
 protocol ChannelChatViewControllerInterface : AnyObject {
     var sender : Sender? {get set}
+    var avatar : Avatar?{get set}
     func setCollectionViewDelegates()
     func showAlert(titleInput : String, messageInput : String)
     var messages: [Message]{get set}
@@ -19,6 +20,7 @@ protocol ChannelChatViewControllerInterface : AnyObject {
 
 class ChannelChatViewController: MessagesViewController {
     var channelName = ""
+    var avatar : Avatar?
     var messages = [Message]()
     var sender: Sender?
     lazy var viewModel = ChannelChatViewModel()
@@ -31,7 +33,7 @@ class ChannelChatViewController: MessagesViewController {
         viewModel.fetchChannelMessage(channelName: channelName)
     }
 }
-extension ChannelChatViewController: MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate {
+extension ChannelChatViewController: MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, MessageCellDelegate {
     func currentSender() -> MessageKit.SenderType {
         if let selfSender = self.sender {
             return selfSender
@@ -47,8 +49,28 @@ extension ChannelChatViewController: MessagesDataSource, MessagesLayoutDelegate,
     func numberOfSections(in messagesCollectionView: MessageKit.MessagesCollectionView) -> Int {
         messages.count
     }
-    
-    
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        let message = messages[indexPath.section]
+        self.viewModel.getUserProfilePic(with: message.sender.senderId)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4), execute: {
+            guard let avt = self.avatar else { return}
+            avatarView.set(avatar: avt)
+        })
+    }
+    func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        let email = messages[indexPath.section].sender.senderId
+        return NSAttributedString(
+          string: email,
+          attributes: [
+            .font: UIFont.preferredFont(forTextStyle: .caption1),
+            .foregroundColor: UIColor(white: 0.3, alpha: 1)
+          ]
+        )
+        
+    }
+    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 35
+    }
 }
 extension ChannelChatViewController : ChannelChatViewControllerInterface {
     func getMessages(messages: [Message]) {
@@ -62,7 +84,7 @@ extension ChannelChatViewController : ChannelChatViewControllerInterface {
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
-        //messagesCollectionView.messageCellDelegate = self
+        messagesCollectionView.messageCellDelegate = self
         //setupInputButton()
         messageInputBar.delegate = self
     }

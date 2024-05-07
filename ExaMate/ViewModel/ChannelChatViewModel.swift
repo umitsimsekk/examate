@@ -54,22 +54,53 @@ protocol ChannelChatViewModelInterface{
     var view : ChannelChatViewControllerInterface? {get set}
     var database : DatabaseManagerProtocol{get}
     var auth : AuthManagerProtocol{get}
+    var storage : StorageManagerProtocol{get}
     func viewDidLoad()
     func viewDidLayoutSubviews()
     func viewWillAppear()
-    func sendMessage(to channelName : String, model : Message)
     func fetchChannelMessage(channelName: String)
     func getUserProfilePic(with email : String)
+    func sendMessage(to channelName : String, model : Message)
+    func sendMessage(channelName: String,sender: SenderType, imageData: Data)
+
 }
 
 class ChannelChatViewModel {
     weak var view: ChannelChatViewControllerInterface?
     var auth: AuthManagerProtocol = AuthManager()
     var database: DatabaseManagerProtocol = DatabaseManager()
+    var storage: StorageManagerProtocol = StorageManager()
 }
 
 
 extension ChannelChatViewModel : ChannelChatViewModelInterface {
+    
+    func sendMessage(channelName: String,sender: SenderType, imageData: Data) {
+        let uuid = UUID().uuidString
+        let senderEmail = sender.senderId
+        storage.uploadMessageImage(sender_email: senderEmail, messageId: uuid, imageData: imageData) { [weak self] uploaded in
+            if uploaded {
+                self?.storage.downloadMessageImageUrl(sender_email: senderEmail, messageId: uuid) { url in
+                    guard url != nil else {
+                        return
+                    }
+                    self?.database.getUsername(email: senderEmail, completion: { username in
+                        let placeHolder = UIImage(systemName: "plus")
+                        let media = Media(url: url,placeholderImage: placeHolder!, size: CGSize(width: 36, height: 36))
+                        let message = Message(sender: sender, messageId: uuid, sentDate: Date(), kind: .photo(media))
+                        
+                        self?.database.sendMessage(to: channelName, username: username, model: message, completion: { success in
+                            if success {
+                                self?.view?.showAlert(titleInput: "Success!", messageInput: "Message successfuly sent")
+                            } else {
+                                self?.view?.showAlert(titleInput: "Error!", messageInput: "Message did not send")
+                            }
+                        })
+                    })
+                }
+            }
+        }
+    }
     func getUserProfilePic(with email: String){
         database.getUserProfilePhoto(email: email) { [weak self] url in
             let imgView = UIImageView()
@@ -107,7 +138,6 @@ extension ChannelChatViewModel : ChannelChatViewModelInterface {
                 }
             }
         }
-        
     }
     
    

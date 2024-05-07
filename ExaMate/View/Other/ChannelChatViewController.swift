@@ -71,6 +71,21 @@ extension ChannelChatViewController: MessagesDataSource, MessagesLayoutDelegate,
     func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
         return 35
     }
+    func configureMediaMessageImageView(_ imageView: UIImageView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        guard let message = message as? Message else {
+            return
+        }
+        
+        switch message.kind {
+        case .photo(let media):
+            guard let mediaUrl = media.url else {
+                return
+            }
+            imageView.sd_setImage(with: mediaUrl)
+        default:
+            break
+        }
+    }
 }
 extension ChannelChatViewController : ChannelChatViewControllerInterface {
     func getMessages(messages: [Message]) {
@@ -85,7 +100,7 @@ extension ChannelChatViewController : ChannelChatViewControllerInterface {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
-        //setupInputButton()
+        setupInputButton()
         messageInputBar.delegate = self
     }
     func showAlert(titleInput : String, messageInput : String){
@@ -93,6 +108,54 @@ extension ChannelChatViewController : ChannelChatViewControllerInterface {
         let action = UIAlertAction(title: "OK!", style: .cancel)
         alert.addAction(action)
         self.present(alert, animated: true)
+    }
+    func setupInputButton() {
+        let button =  InputBarButtonItem()
+        button.setSize(CGSize(width: 35, height: 35), animated: false)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.tintColor = .label
+        button.onTouchUpInside { [weak self] _ in
+            self?.presentInputActionSheet()
+        }
+        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
+        messageInputBar.setStackViewItems([button], forStack: .left, animated: false)
+    }
+    func presentInputActionSheet() {
+        let actionSheet = UIAlertController(title: "Attach media", message: "What would you like to attach?", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Photo", style: .default, handler: { [weak self] _ in
+            self?.presentPhotoActionSheet()
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Video", style: .default, handler: {  _ in
+            
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Audio", style: .default, handler: {  _ in
+            
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(actionSheet, animated: true)
+    }
+    
+    func presentPhotoActionSheet() {
+        let actionSheet = UIAlertController(title: "Attach photo", message: "Where would you like to attach a photo from", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] _ in
+            let picker = UIImagePickerController()
+            picker.sourceType = .camera
+            picker.allowsEditing = true
+            picker.delegate = self
+            self?.present(picker, animated: true)
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Photo Library", style: .default, handler: { [weak self] _ in
+            let picker = UIImagePickerController()
+            picker.sourceType = .photoLibrary
+            picker.allowsEditing = true
+            picker.delegate = self
+            self?.present(picker, animated: true)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil ))
+        self.present(actionSheet, animated: true)
     }
     
 }
@@ -108,4 +171,16 @@ extension ChannelChatViewController : InputBarAccessoryViewDelegate {
         viewModel.sendMessage(to: channelName, model: message)
         
     }
+}
+extension ChannelChatViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        guard let image = info[.editedImage] as? UIImage,
+              let imageData = image.pngData(), let selfSender =  sender else {
+            return
+        }
+        viewModel.sendMessage(channelName: channelName, sender: selfSender, imageData: imageData)
+    }
+    
+    
 }

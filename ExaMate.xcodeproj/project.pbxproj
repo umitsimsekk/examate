@@ -53,6 +53,9 @@
 		DBE07FEC2BC1298B009C0EAD /* SettingClassViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE07FEB2BC1298B009C0EAD /* SettingClassViewController.swift */; };
 		DBE1E7A82B9B26E100F7FA7E /* LessonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE1E7A72B9B26E100F7FA7E /* LessonViewController.swift */; };
 		DBE1E7AA2B9B26ED00F7FA7E /* AnswerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE1E7A92B9B26ED00F7FA7E /* AnswerViewController.swift */; };
+		DBF8F4922BEB7A8900C52A71 /* PhotoViewerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF8F4912BEB7A8900C52A71 /* PhotoViewerViewController.swift */; };
+		DBF8F4942BEB7CB600C52A71 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF8F4932BEB7CB600C52A71 /* ProfileViewController.swift */; };
+		DBF8F4962BEB7E1800C52A71 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF8F4952BEB7E1800C52A71 /* ProfileViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +131,9 @@
 		DBE07FEB2BC1298B009C0EAD /* SettingClassViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingClassViewController.swift; sourceTree = "<group>"; };
 		DBE1E7A72B9B26E100F7FA7E /* LessonViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LessonViewController.swift; sourceTree = "<group>"; };
 		DBE1E7A92B9B26ED00F7FA7E /* AnswerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnswerViewController.swift; sourceTree = "<group>"; };
+		DBF8F4912BEB7A8900C52A71 /* PhotoViewerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerViewController.swift; sourceTree = "<group>"; };
+		DBF8F4932BEB7CB600C52A71 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		DBF8F4952BEB7E1800C52A71 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		DE8E25EAB3BDD87AB091B095 /* Pods_ExaMate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExaMate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -205,6 +211,7 @@
 				DB7974F42BBC119600E801B0 /* PrivateViewModel.swift */,
 				DB7974F92BBC199E00E801B0 /* SettingViewModel.swift */,
 				DBA8A0C62BE24A9B0054BBB3 /* ChannelChatViewModel.swift */,
+				DBF8F4952BEB7E1800C52A71 /* ProfileViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -248,6 +255,8 @@
 			children = (
 				DB2A441E2BA30524008051BB /* CommentViewController.swift */,
 				DBCA3D5F2BE0F32B00378E36 /* ChannelChatViewController.swift */,
+				DBF8F4912BEB7A8900C52A71 /* PhotoViewerViewController.swift */,
+				DBF8F4932BEB7CB600C52A71 /* ProfileViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -623,6 +632,7 @@
 				DBB8F72D2B95E569000C138F /* GroupsViewController.swift in Sources */,
 				DB7974FA2BBC199E00E801B0 /* SettingViewModel.swift in Sources */,
 				DB3D74152B8B4825009806E2 /* LoginViewController.swift in Sources */,
+				DBF8F4922BEB7A8900C52A71 /* PhotoViewerViewController.swift in Sources */,
 				DB7974F52BBC119600E801B0 /* PrivateViewModel.swift in Sources */,
 				DBB8F7272B95E51C000C138F /* MainTabbarViewController.swift in Sources */,
 				DB2A44252BA3075F008051BB /* Comment.swift in Sources */,
@@ -633,6 +643,7 @@
 				DB3D73E52B8B47E4009806E2 /* AppDelegate.swift in Sources */,
 				DBE07FEC2BC1298B009C0EAD /* SettingClassViewController.swift in Sources */,
 				DB0933E82B8F4BC200B3F8C7 /* SignupViewController.swift in Sources */,
+				DBF8F4962BEB7E1800C52A71 /* ProfileViewModel.swift in Sources */,
 				DBB066812B9853D90086516D /* StorageManager.swift in Sources */,
 				DB0933E12B8F4B2700B3F8C7 /* SignupViewModel.swift in Sources */,
 				DBA8A0C72BE24A9B0054BBB3 /* ChannelChatViewModel.swift in Sources */,
@@ -655,6 +666,7 @@
 				DBB066862B9862EA0086516D /* PostViewModel.swift in Sources */,
 				DBB0667B2B9852780086516D /* Post.swift in Sources */,
 				DBCA3D5E2BE0F0C300378E36 /* ChatTableViewCell.swift in Sources */,
+				DBF8F4942BEB7CB600C52A71 /* ProfileViewController.swift in Sources */,
 				DBB066762B9851FF0086516D /* FeedViewModel.swift in Sources */,
 				DBB8F72F2B95E57E000C138F /* PrivateViewController.swift in Sources */,
 			);

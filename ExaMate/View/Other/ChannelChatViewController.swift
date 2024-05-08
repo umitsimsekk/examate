@@ -86,6 +86,55 @@ extension ChannelChatViewController: MessagesDataSource, MessagesLayoutDelegate,
             break
         }
     }
+    func didTapImage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for:cell) else {
+            return
+        }
+        let message = messages[indexPath.section]
+        switch message.kind {
+        case .photo(let media):
+            guard let mediaUrl = media.url else {
+                return
+            }
+            let vc = PhotoViewerViewController(url: mediaUrl)
+            navigationController?.pushViewController(vc, animated: true)
+        default:
+            break
+        }
+    }
+    func didTapMessage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = self.messagesCollectionView.indexPath(for:cell) else {
+            return
+        }
+        let message = self.messages[indexPath.section]
+        
+        let actionSheet = UIAlertController(title: "İşlemler", message: "Bir seçeneği seçiniz...", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Profili Görüntüle", style: .default, handler: { [weak self] _ in
+           
+            switch message.kind {
+            case .text(let str):
+                guard let txt = str as? String else {
+                    return
+                }
+                let vc = ProfileViewController(message: message )
+                self?.navigationController?.pushViewController(vc, animated: true)
+            default:
+                break
+            }
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Chat GPT'ye Sor", style: .default, handler: { [weak self] _ in
+            switch message.kind {
+            case .text(let str):
+                print("txt : \(str)")
+                //self?.fetchChatGPTResponseFor(prompt: str)
+            default:
+                break
+            }
+        }))
+        actionSheet.addAction(UIAlertAction(title:"Cancel", style: .cancel, handler: nil ))
+        self.present(actionSheet, animated: true)
+    }
 }
 extension ChannelChatViewController : ChannelChatViewControllerInterface {
     func getMessages(messages: [Message]) {

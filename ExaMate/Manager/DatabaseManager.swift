@@ -32,6 +32,9 @@ protocol DatabaseManagerProtocol {
     func getUserProfilePhoto(email: String ,completion : @escaping(URL?)->Void)
     func getUserProfileInfo(email: String ,completion : @escaping(Result<Profile,DataError>)->Void)
     func insertProfileInfo(profile : Profile, completion: @escaping(Bool)->Void)
+    func getUserPostCountForProfile(email : String , completion: @escaping(Int)->Void)
+    func getUserCommentCountForProfile(email : String , completion: @escaping(Int)->Void)
+    func getUserChannelCountForProfile(email : String , completion: @escaping(Int)->Void)
 
     
     //Comment
@@ -51,7 +54,7 @@ protocol DatabaseManagerProtocol {
 class DatabaseManager : DatabaseManagerProtocol {
     
     let database = Firestore.firestore()
-    
+    //user
     func insertUser(model user : User, completion: @escaping(Bool)->Void) {
         guard let data = [
             "username" : user.username,
@@ -90,7 +93,7 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(.success(User(username: username, email: email, password: password)))
         }
     }
-    
+    //post
     func insertPost(model post : Post,completion: @escaping(Bool)->Void) {
         guard let data = [
             "postedBy" : post.postedBy,
@@ -140,7 +143,7 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(.success(posts))
         }
     }
-    
+    //profile
     func getUserProfilePhoto(email: String ,completion : @escaping(URL?)->Void) {
         database.collection("Profile").document(email).getDocument { documentsnaps, error in
             guard error == nil,
@@ -187,7 +190,43 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(.success(profile))
         }
     }
+    func getUserPostCountForProfile(email : String , completion: @escaping(Int)->Void){
+        database.collection("Post").whereField("postedBy", isEqualTo: email).getDocuments { query, error in
+            guard let documents = query?.documents, error == nil else {
+                completion(0)
+                return
+            }
+            completion(documents.count)
+        }
+    }
+    func getUserCommentCountForProfile(email : String , completion: @escaping(Int)->Void){
+        database.collection("Comment").whereField("commentBy", isEqualTo: email).getDocuments { query, error in
+            guard let documents = query?.documents, error == nil else {
+                completion(0)
+                return
+            }
+            completion(documents.count)
+        }
+    }
+    func getUserChannelCountForProfile(email : String , completion: @escaping(Int)->Void){
+        var channels = [String]()
+        database.collection("Chat").whereField("sender_email", isEqualTo: email).getDocuments { query, error in
+            guard let documents = query?.documents, error == nil else {
+                completion(0)
+                return
+            }
+            for document in documents {
+                guard let channel = document.get("channel") as? String else { return}
+                
+                if !channels.contains(channel) {
+                    channels.append(channel)
+                }
+            }
+            completion(channels.count)
+        }
+    }
     
+    //comment
     func getCommentsCount(postId : String, completion: @escaping(Int)->Void) {
         var output = 0
         database.collection("Comment").getDocuments { querySnapshot, error in

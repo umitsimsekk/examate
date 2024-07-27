@@ -20,7 +20,7 @@ protocol DatabaseManagerProtocol {
     func insertUser(model user : User, completion: @escaping(Bool)->Void)
     func getUsername(email : String, completion:@escaping(String)->Void)
     func getUserInfo(email: String, completion: @escaping(Result<User,DataError>)->Void)
-    
+    func getAllUser(completion : @escaping(Result<[User], DataError>) -> Void)
     
     //Post
     func insertPost(model post : Post,completion: @escaping(Bool)->Void)
@@ -55,6 +55,28 @@ class DatabaseManager : DatabaseManagerProtocol {
     
     let database = Firestore.firestore()
     //user
+    func getAllUser(completion : @escaping(Result<[User], DataError>) -> Void) {
+        var users = [User]()
+        database.collection("User").getDocuments { snapshot, error in
+            guard error == nil, let document = snapshot?.documents else {
+                completion(.failure(.fetchUserError))
+                return
+            }
+            for doc in document {
+                guard let email = doc["email"] as? String,
+                      let passowrd = doc["password"] as? String,
+                      let username = doc["username"] as? String
+                else {
+                    print("Invalid fetch comments")
+                    completion(.failure(.fetchUserError))
+                    return
+                }
+                let user = User(username: username, email: email, password: passowrd)
+                users.append(user)
+            }
+            completion(.success(users))
+        }
+    }
     func insertUser(model user : User, completion: @escaping(Bool)->Void) {
         guard let data = [
             "username" : user.username,

@@ -18,14 +18,31 @@ class PrivateViewController: UIViewController {
         view.backgroundColor = .systemBackground
         viewModel.view = self
         viewModel.viewDidLoad()
-
     }
-
 }
 
 extension PrivateViewController : PrivateViewControllerInterface {
     @objc func didTapComposeButton() {
-        
+        let vc = NewConversationViewController()
+        vc.completion = { [weak self] result in
+            print(result)
+            self?.createNewConvorsation(results: result)
+        }
+        let navVc = UINavigationController(rootViewController: vc)
+        present(navVc, animated: true)
+    }
+    private func createNewConvorsation(results : User) {
+        guard let email = results.email as? String,
+              let username = results.username as? String else {
+            return
+        }
+        print(email)
+        /*let vc = PrivateChatViewController(with: email)
+        vc.title = username
+        vc.isNewConversation = true
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+         */
     }
     @objc func didTapSettingButton() {
         let email = viewModel.getCurrentUserEmail()

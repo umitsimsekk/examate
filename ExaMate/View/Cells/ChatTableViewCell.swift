@@ -12,7 +12,13 @@ struct ChatCellModel {
     let senderUsername : String
     let content : String
 }
+protocol ChatTableViewCellInterface : AnyObject {
+    func setLayoutSubviews()
+    func configView()
+    func fetchInfoToChannel(latestMessage: String)
+}
 class ChatTableViewCell: UITableViewCell {
+    lazy var viewModel = ChatTableViewViewModel()
 
     static let identifier = "ChatTableViewCell"
     private let containerView : UIView = {
@@ -54,7 +60,8 @@ class ChatTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super .init(style: style, reuseIdentifier: reuseIdentifier)
-        configView()
+        viewModel.view = self
+        viewModel.viewDidLoad()
     }
     
     required init?(coder: NSCoder) {
@@ -62,6 +69,29 @@ class ChatTableViewCell: UITableViewCell {
     }
     override func layoutSubviews() {
         super .layoutSubviews()
+        viewModel.viewDidLayoutSubviews()
+        
+    }
+    
+    public func configure(photo : String, name : String) {
+        self.channelLogo.image = UIImage(named: photo)
+        self.channelName.text = name
+        viewModel.fetchInfoToChannel(channelName: name)
+
+    }
+}
+extension ChatTableViewCell : ChatTableViewCellInterface {
+    func fetchInfoToChannel(latestMessage: String) {
+        self.contentLabel.text = latestMessage
+    }
+    
+    func configView(){
+        containerView.addSubview(channelLogo)
+        containerView.addSubview(channelName)
+        containerView.addSubview(contentLabel)
+        contentView.addSubview(containerView)
+    }
+    func setLayoutSubviews() {
         self.containerView.frame = CGRect(x: 5,
                                           y: 3,
                                           width: contentView.width-10,
@@ -78,18 +108,6 @@ class ChatTableViewCell: UITableViewCell {
                                         y: channelName.bottom,
                                         width: containerView.width-100,
                                         height: 50)
-        
     }
-    func configView(){
-        containerView.addSubview(channelLogo)
-        containerView.addSubview(channelName)
-        containerView.addSubview(contentLabel)
-        contentView.addSubview(containerView)
-    }
-    public func configure(photo : String, name : String) {
-        self.channelLogo.image = UIImage(named: photo)
-        self.channelName.text = name
-        //fetchInfoToChannel(channelName: name)
-
-    }
+    
 }

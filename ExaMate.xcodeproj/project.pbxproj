@@ -30,6 +30,9 @@
 		DB3D74062B8B47E6009806E2 /* ExaMateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3D74052B8B47E6009806E2 /* ExaMateUITests.swift */; };
 		DB3D74082B8B47E6009806E2 /* ExaMateUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3D74072B8B47E6009806E2 /* ExaMateUITestsLaunchTests.swift */; };
 		DB3D74152B8B4825009806E2 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3D74142B8B4825009806E2 /* LoginViewController.swift */; };
+		DB4155142C5556DE0046344D /* ChatTableViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4155132C5556DE0046344D /* ChatTableViewViewModel.swift */; };
+		DB4155162C5592070046344D /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4155152C5592070046344D /* NewConversationViewController.swift */; };
+		DB4155182C55979F0046344D /* NewConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4155172C55979F0046344D /* NewConversationViewModel.swift */; };
 		DB7974F52BBC119600E801B0 /* PrivateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7974F42BBC119600E801B0 /* PrivateViewModel.swift */; };
 		DB7974F82BBC14B400E801B0 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7974F72BBC14B400E801B0 /* SettingViewController.swift */; };
 		DB7974FA2BBC199E00E801B0 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7974F92BBC199E00E801B0 /* SettingViewModel.swift */; };
@@ -108,6 +111,9 @@
 		DB3D74052B8B47E6009806E2 /* ExaMateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExaMateUITests.swift; sourceTree = "<group>"; };
 		DB3D74072B8B47E6009806E2 /* ExaMateUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExaMateUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		DB3D74142B8B4825009806E2 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		DB4155132C5556DE0046344D /* ChatTableViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewViewModel.swift; sourceTree = "<group>"; };
+		DB4155152C5592070046344D /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
+		DB4155172C55979F0046344D /* NewConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewModel.swift; sourceTree = "<group>"; };
 		DB7974F42BBC119600E801B0 /* PrivateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateViewModel.swift; sourceTree = "<group>"; };
 		DB7974F72BBC14B400E801B0 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		DB7974F92BBC199E00E801B0 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
@@ -212,6 +218,8 @@
 				DB7974F92BBC199E00E801B0 /* SettingViewModel.swift */,
 				DBA8A0C62BE24A9B0054BBB3 /* ChannelChatViewModel.swift */,
 				DBF8F4952BEB7E1800C52A71 /* ProfileViewModel.swift */,
+				DB4155132C5556DE0046344D /* ChatTableViewViewModel.swift */,
+				DB4155172C55979F0046344D /* NewConversationViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -333,6 +341,7 @@
 				DB7974F72BBC14B400E801B0 /* SettingViewController.swift */,
 				DBE07FE92BC127FD009C0EAD /* SettingLessonViewController.swift */,
 				DBE07FEB2BC1298B009C0EAD /* SettingClassViewController.swift */,
+				DB4155152C5592070046344D /* NewConversationViewController.swift */,
 			);
 			path = Private;
 			sourceTree = "<group>";
@@ -647,6 +656,7 @@
 				DBB066812B9853D90086516D /* StorageManager.swift in Sources */,
 				DB0933E12B8F4B2700B3F8C7 /* SignupViewModel.swift in Sources */,
 				DBA8A0C72BE24A9B0054BBB3 /* ChannelChatViewModel.swift in Sources */,
+				DB4155182C55979F0046344D /* NewConversationViewModel.swift in Sources */,
 				DBE1E7A82B9B26E100F7FA7E /* LessonViewController.swift in Sources */,
 				DB2A441F2BA30524008051BB /* CommentViewController.swift in Sources */,
 				DBB066842B9862A90086516D /* PostViewController.swift in Sources */,
@@ -665,9 +675,11 @@
 				DB2A44212BA30564008051BB /* CommentTableViewCell.swift in Sources */,
 				DBB066862B9862EA0086516D /* PostViewModel.swift in Sources */,
 				DBB0667B2B9852780086516D /* Post.swift in Sources */,
+				DB4155162C5592070046344D /* NewConversationViewController.swift in Sources */,
 				DBCA3D5E2BE0F0C300378E36 /* ChatTableViewCell.swift in Sources */,
 				DBF8F4942BEB7CB600C52A71 /* ProfileViewController.swift in Sources */,
 				DBB066762B9851FF0086516D /* FeedViewModel.swift in Sources */,
+				DB4155142C5556DE0046344D /* ChatTableViewViewModel.swift in Sources */,
 				DBB8F72F2B95E57E000C138F /* PrivateViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

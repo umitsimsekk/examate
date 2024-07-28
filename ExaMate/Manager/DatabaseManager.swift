@@ -49,6 +49,10 @@ protocol DatabaseManagerProtocol {
     //Chat
     func sendMessage(to chatChannel: String,username : String, model chat : Message, completion : @escaping(Bool) -> Void)
     func getAllMessagesByChannelName(channelName : String, completion: @escaping(Result<[Message],DataError>)->Void)
+    
+    //Private Chat
+    func createNewConversation(with otherUserEmail : String, firstMessage : Message,username: String, completion: @escaping (Bool) -> Void)
+    func getAllMessagesForConversation(sender_email : String,other_email : String, completion: @escaping(Result<[Message],DataError>) -> Void)
 }
 
 class DatabaseManager : DatabaseManagerProtocol {
@@ -402,6 +406,54 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(true)
         }
     }
+    ///Get all message for a given convo
+    func getAllMessagesForConversation(sender_email : String,other_email : String, completion: @escaping(Result<[Message],DataError>) -> Void) {
+        var messages = [Message]()
+        database.collection("Message").order(by: "date", descending: false).getDocuments { querysnapshot, error in
+            guard error == nil, let documents = querysnapshot?.documents else {
+                return
+            }
+            
+            for document in documents {
+                guard let content =  document["content"] as? String,
+                      let id = document["id"]  as? String,
+                      let type =  document["type"]  as? String,
+                      let date = document["date"] as? Timestamp,
+                      let datee = date.dateValue() as? Date,
+                      let sender_user_email = document["sender_user_email"] as? String,
+                      let other_user_email = document["other_user_email"] as? String,
+                      let username = document["username"] as? String,
+                      let isRead = document["is_read"]  as? Bool
+                else {
+                    completion(.failure(.fetchChatError))
+                    return
+                }
+                if (sender_user_email == sender_email && other_user_email == other_email) || (sender_user_email == other_email && other_user_email == sender_email ){
+                    var kind : MessageKind?
+                    if type == "photo" {
+                        guard let url = URL(string: content) as? URL,
+                        let placeHolder = UIImage(systemName: "plus") else {
+                            return
+                        }
+                        let media = Media(url:url,placeholderImage: placeHolder, size: CGSize(width: 300, height: 300))
+                        
+                        kind = .photo(media)
+                    } else {
+                        kind = .text(content)
+                    }
+                    guard let finalKind = kind else {
+                        return
+                    }
+                    let sender = Sender(senderId: sender_user_email, displayName: username)
+                    let message = Message(sender: sender, messageId: id, sentDate: datee, kind: finalKind)
+                    messages.append(message)
+                }
+                
+            }
+            completion(.success(messages))
+        }
+    
+    }
     func setChannelName(channelName : String) -> String {
         var name = channelName
         if channelName == "TYT Kanalı" {
@@ -461,4 +513,62 @@ class DatabaseManager : DatabaseManagerProtocol {
         }
        
     }
+    //Private Chat
+    
+    
+    ///Create a new conversation  with target user email and firstmessage sent
+    func createNewConversation(with otherUserEmail : String, firstMessage : Message,username: String, completion: @escaping (Bool) -> Void) {
+        guard let currentUserEmail = AuthManager().getCurrentUserEmail() as? String else {
+            return
+        }
+        let conversationId = "conversation_\(firstMessage.messageId)"
+        let messageDate = firstMessage.sentDate
+        //let dateString = PrivateChatViewController.dateFormatter.string(from: messageDate)
+        var message = ""
+        switch firstMessage.kind {
+        case .text(let messageText):
+            message = messageText
+            break
+        case .attributedText(_):
+            break
+        case .photo(let mediaItem):
+            if let urlString = mediaItem.url?.absoluteString {
+                message = urlString
+            }
+            break
+        case .video(_):
+            break
+        case .location(_):
+            break
+        case .emoji(_):
+            break
+        case .audio(_):
+            break
+        case .contact(_):
+            break
+        case .linkPreview(_):
+            break
+        case .custom(_):
+            break
+        }
+        let newConversationData : [ String : Any ] = [
+            "id" : conversationId,
+            "other_user_email" : otherUserEmail,
+            "sender_user_email" : currentUserEmail,
+            "content" : message,
+            "date" : firstMessage.sentDate,
+            "is_read" : false,
+            "type" : firstMessage.kind.messsageKindString,
+            "username" : username
+        ]
+        database.collection("Message").document(conversationId).setData(newConversationData) { error in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+        
+    }
+   
 }

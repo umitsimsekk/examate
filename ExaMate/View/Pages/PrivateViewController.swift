@@ -37,12 +37,12 @@ extension PrivateViewController : PrivateViewControllerInterface {
             return
         }
         print(email)
-        /*let vc = PrivateChatViewController(with: email)
+        let vc = PrivateChatViewController(with: email)
         vc.title = username
         vc.isNewConversation = true
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
-         */
+         
     }
     @objc func didTapSettingButton() {
         let email = viewModel.getCurrentUserEmail()

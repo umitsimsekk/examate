@@ -9,6 +9,10 @@ import UIKit
 import MessageKit
 import InputBarAccessoryView
 
+struct sendImageToChat {
+    
+}
+
 protocol PrivateChatViewControllerInterface : AnyObject {
     func setCollectionViewDelegates()
     func createMessageId() -> String?
@@ -54,12 +58,14 @@ class PrivateChatViewController: MessagesViewController {
         super.viewDidLoad()
         viewModel.view = self
         viewModel.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
     }
 }
 
 extension PrivateChatViewController: PrivateChatViewControllerInterface {
+    func getImageURL(url: URL?) -> URL? {
+        return url
+    }
+    
     func listenForMessage() {
         guard let selfSender = sender else {
             return
@@ -77,7 +83,7 @@ extension PrivateChatViewController: PrivateChatViewControllerInterface {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
-        //setupInputButton()
+        setupInputButton()
         messageInputBar.delegate = self
     }
     public func createMessageId() -> String? {
@@ -105,6 +111,12 @@ extension PrivateChatViewController : MessagesDataSource,MessagesDisplayDelegate
     func numberOfSections(in messagesCollectionView: MessageKit.MessagesCollectionView) -> Int {
         messages.count
     }
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        let message = messages[indexPath.section]
+        let imageView = UIImageView()
+        
+
+    }
     
 }
 extension PrivateChatViewController : InputBarAccessoryViewDelegate {
@@ -124,5 +136,69 @@ extension PrivateChatViewController : InputBarAccessoryViewDelegate {
                               sentDate: Date(),
                               kind: .text(text))
         viewModel.createNewConversation(with: self.otherUserEmail, message: message, senderUsername: senderUsername)
+    }
+}
+extension PrivateChatViewController {
+    func setupInputButton() {
+        let button =  InputBarButtonItem()
+        button.setSize(CGSize(width: 35, height: 35), animated: false)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.tintColor = .label
+        button.onTouchUpInside { [weak self] _ in
+            self?.presentInputActionSheet()
+        }
+        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
+        messageInputBar.setStackViewItems([button], forStack: .left, animated: false)
+    }
+    func presentInputActionSheet() {
+        let actionSheet = UIAlertController(title: "Attach media", message: "What would you like to attach?", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Photo", style: .default, handler: { [weak self] _ in
+            self?.presentPhotoActionSheet()
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Video", style: .default, handler: {  _ in
+            
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Audio", style: .default, handler: {  _ in
+            
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(actionSheet, animated: true)
+    }
+    func presentPhotoActionSheet() {
+        let actionSheet = UIAlertController(title: "Attach photo", message: "Where would you like to attach a photo from", preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] _ in
+            let picker = UIImagePickerController()
+            picker.sourceType = .camera
+            picker.allowsEditing = true
+            picker.delegate = self
+            self?.present(picker, animated: true)
+        }))
+        actionSheet.addAction(UIAlertAction(title: "Photo Library", style: .default, handler: { [weak self] _ in
+            let picker = UIImagePickerController()
+            picker.sourceType = .photoLibrary
+            picker.allowsEditing = true
+            picker.delegate = self
+            self?.present(picker, animated: true)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil ))
+        self.present(actionSheet, animated: true)
+    }
+}
+extension PrivateChatViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        
+        guard let image = info[.editedImage] as? UIImage,
+              let imageData = image.pngData(), sender != nil,
+              let selfSender = sender
+        else {
+            return
+        }
+        viewModel.sendMessage(sender: selfSender, senderEmail: selfSender.senderId, imageData: imageData, otherEmail: otherUserEmail)
+        
+        
     }
 }

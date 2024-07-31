@@ -53,6 +53,7 @@ protocol DatabaseManagerProtocol {
     //Private Chat
     func createNewConversation(with otherUserEmail : String, firstMessage : Message,username: String, completion: @escaping (Bool) -> Void)
     func getAllMessagesForConversation(sender_email : String,other_email : String, completion: @escaping(Result<[Message],DataError>) -> Void)
+    func getAllConversation(for email : String, completion: @escaping(Result<[Convos],DataError>)->Void)
 }
 
 class DatabaseManager : DatabaseManagerProtocol {
@@ -569,6 +570,54 @@ class DatabaseManager : DatabaseManagerProtocol {
             completion(true)
         }
         
+    }
+    ///Fetches and return all convo for the user with passed in email
+    func getAllConversation(for email : String, completion: @escaping(Result<[Convos],DataError>)->Void) {
+        var convos = [Convos]()
+        database.collection("Message").order(by: "date", descending: false).getDocuments { querysnapshot, error in
+            guard error == nil, let documents = querysnapshot?.documents else {
+                return
+            }
+            
+            for document in documents {
+                guard let content =  document["content"] as? String,
+                      let id = document["id"]  as? String,
+                      let type =  document["type"]  as? String,
+                      let date = document["date"] as? Timestamp,
+                      let datee = date.dateValue() as? Date,
+                      let sender_user_email = document["sender_user_email"] as? String,
+                      let other_user_email = document["other_user_email"] as? String,
+                      let username = document["username"] as? String,
+                      let isRead = document["is_read"]  as? Bool
+                else {
+                    completion(.failure(.fetchChatError))
+                    return
+                }
+                if sender_user_email == email {
+                  
+                    
+                    let convo = Convos(content: content,
+                                        id: id,
+                                        type: type,
+                                        date: datee,
+                                        sender_email: sender_user_email,
+                                        other_email: other_user_email,
+                                        isRead: isRead,
+                                        username: username)
+                    convos.append(convo)
+                }
+                
+            }
+            var newConvos = [Convos]()
+           
+            for convo in convos.reversed() {
+                if !newConvos.contains { $0.other_email == convo.other_email } {
+                    newConvos.append(convo)
+                }
+                
+            }
+            completion(.success(newConvos))
+        }
     }
    
 }

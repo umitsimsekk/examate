@@ -18,6 +18,10 @@ protocol StorageManagerProtocol : AnyObject {
     //Message
     func uploadMessageImage(sender_email: String, messageId : String ,imageData : Data, completion : @escaping(Bool)->Void)
     func downloadMessageImageUrl(sender_email : String, messageId : String , completion : @escaping(URL?) -> Void)
+    
+    //Private
+    func uploadPrivateMessageImage(sender_email: String, messageId : String ,imageData : Data, completion : @escaping(Bool)->Void)
+    func downloadPrivateMessageImageUrl(sender_email : String, messageId : String , completion : @escaping(URL?) -> Void)
 }
 
 class StorageManager : StorageManagerProtocol {
@@ -83,6 +87,28 @@ class StorageManager : StorageManagerProtocol {
     
     func downloadMessageImageUrl(sender_email : String, messageId : String , completion : @escaping(URL?) -> Void){
         let path = "message/\(sender_email)/\(messageId).png"
+        storage.reference(withPath: path).downloadURL { url, error in
+            guard url != nil , error == nil else {
+                return
+            }
+            completion(url)
+        }
+    }
+    //Private
+    
+    func uploadPrivateMessageImage(sender_email: String, messageId : String ,imageData : Data, completion : @escaping(Bool)->Void){
+        let path = "private/\(sender_email)/\(messageId).png"
+        storage.reference(withPath: path).putData(imageData) { metadata, error in
+            guard metadata != nil, error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    
+    func downloadPrivateMessageImageUrl(sender_email : String, messageId : String , completion : @escaping(URL?) -> Void){
+        let path = "private/\(sender_email)/\(messageId).png"
         storage.reference(withPath: path).downloadURL { url, error in
             guard url != nil , error == nil else {
                 return

@@ -11,19 +11,52 @@ protocol PrivateChatViewModelInterface {
     var view : PrivateChatViewControllerInterface?{ get set}
     var database : DatabaseManagerProtocol{get}
     var auth : AuthManagerProtocol{get}
+    var storage: StorageManagerProtocol{ get}
     
     func sender() -> Sender?
     func viewDidLayoutSubviews()
     func viewDidLoad()
+    
     func createNewConversation(with email: String, message: Message, senderUsername: String )
-    func listenForMessage(senderEmail: String, otherEmail: String)}
+    func listenForMessage(senderEmail: String, otherEmail: String)
+    func sendMessage(sender: Sender,senderEmail: String,imageData: Data,otherEmail:String)
+}
 class PrivateChatViewModel {
     weak var view : PrivateChatViewControllerInterface?
     var database : DatabaseManagerProtocol = DatabaseManager()
     var auth: AuthManagerProtocol = AuthManager()
+    var storage: StorageManagerProtocol = StorageManager()
 }
 
 extension PrivateChatViewModel : PrivateChatViewModelInterface {
+
+    func sendMessage(sender: Sender,senderEmail: String,imageData: Data,otherEmail:String){
+        let uuid = UUID().uuidString
+        storage.uploadPrivateMessageImage(sender_email: senderEmail, messageId: uuid, imageData: imageData) { [weak self] uploaded in
+            if uploaded {
+                self?.storage.downloadPrivateMessageImageUrl(sender_email: senderEmail, messageId: uuid) { url in
+                    guard url != nil else {
+                        return
+                    }
+                    self?.database.getUsername(email: otherEmail) { username in
+                        let placeHolder = UIImage(systemName: "plus")
+                        let media = Media(url: url,placeholderImage: placeHolder!, size: CGSize(width: 36, height: 36))
+                        let message = Message(sender:sender, messageId: uuid, sentDate: Date(), kind: .photo(media))
+                        self?.database.createNewConversation(with: otherEmail, firstMessage: message, username: username, completion: { success in
+                            if success {
+                                print("pic successfuly arrived")
+                            } else {
+                                print("pic error")
+
+                            }
+                        })
+                    }
+                }
+            }
+            
+        }
+        
+    }
     func listenForMessage(senderEmail: String, otherEmail: String) {
         database.getAllMessagesForConversation(sender_email: senderEmail, other_email: otherEmail) { [weak self] result in
             switch result {

@@ -53,6 +53,9 @@
 		DBB8F72F2B95E57E000C138F /* PrivateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB8F72E2B95E57E000C138F /* PrivateViewController.swift */; };
 		DBCA3D5E2BE0F0C300378E36 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCA3D5D2BE0F0C300378E36 /* ChatTableViewCell.swift */; };
 		DBCA3D602BE0F32B00378E36 /* ChannelChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCA3D5F2BE0F32B00378E36 /* ChannelChatViewController.swift */; };
+		DBD8C5872C58EA2000FE2948 /* Convo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD8C5862C58EA2000FE2948 /* Convo.swift */; };
+		DBD8C5892C58EB9F00FE2948 /* PrivateChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD8C5882C58EB9F00FE2948 /* PrivateChatTableViewCell.swift */; };
+		DBD8C58B2C58ECA500FE2948 /* PrivateChatTableViewCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD8C58A2C58ECA500FE2948 /* PrivateChatTableViewCellViewModel.swift */; };
 		DBE07FE82BC123C8009C0EAD /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE07FE72BC123C8009C0EAD /* Profile.swift */; };
 		DBE07FEA2BC127FD009C0EAD /* SettingLessonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE07FE92BC127FD009C0EAD /* SettingLessonViewController.swift */; };
 		DBE07FEC2BC1298B009C0EAD /* SettingClassViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE07FEB2BC1298B009C0EAD /* SettingClassViewController.swift */; };
@@ -136,6 +139,9 @@
 		DBB8F72E2B95E57E000C138F /* PrivateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateViewController.swift; sourceTree = "<group>"; };
 		DBCA3D5D2BE0F0C300378E36 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		DBCA3D5F2BE0F32B00378E36 /* ChannelChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelChatViewController.swift; sourceTree = "<group>"; };
+		DBD8C5862C58EA2000FE2948 /* Convo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convo.swift; sourceTree = "<group>"; };
+		DBD8C5882C58EB9F00FE2948 /* PrivateChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateChatTableViewCell.swift; sourceTree = "<group>"; };
+		DBD8C58A2C58ECA500FE2948 /* PrivateChatTableViewCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateChatTableViewCellViewModel.swift; sourceTree = "<group>"; };
 		DBE07FE72BC123C8009C0EAD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		DBE07FE92BC127FD009C0EAD /* SettingLessonViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingLessonViewController.swift; sourceTree = "<group>"; };
 		DBE07FEB2BC1298B009C0EAD /* SettingClassViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingClassViewController.swift; sourceTree = "<group>"; };
@@ -225,6 +231,7 @@
 				DBF8F4952BEB7E1800C52A71 /* ProfileViewModel.swift */,
 				DB4155132C5556DE0046344D /* ChatTableViewViewModel.swift */,
 				DB4155172C55979F0046344D /* NewConversationViewModel.swift */,
+				DBD8C58A2C58ECA500FE2948 /* PrivateChatTableViewCellViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -259,6 +266,7 @@
 				DBB0667A2B9852780086516D /* Post.swift */,
 				DB0933E52B8F4B8600B3F8C7 /* User.swift */,
 				DBE07FE72BC123C8009C0EAD /* Profile.swift */,
+				DBD8C5862C58EA2000FE2948 /* Convo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -359,6 +367,7 @@
 				DB2A44202BA30564008051BB /* CommentTableViewCell.swift */,
 				DBB066782B98523D0086516D /* FeedTableViewCell.swift */,
 				DBB0667C2B9852BB0086516D /* LessonsTableViewCell.swift */,
+				DBD8C5882C58EB9F00FE2948 /* PrivateChatTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -645,6 +654,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB1833FE2C562B1E0035D1CE /* PrivateChatViewController.swift in Sources */,
+				DBD8C5872C58EA2000FE2948 /* Convo.swift in Sources */,
 				DBB8F72D2B95E569000C138F /* GroupsViewController.swift in Sources */,
 				DB7974FA2BBC199E00E801B0 /* SettingViewModel.swift in Sources */,
 				DB3D74152B8B4825009806E2 /* LoginViewController.swift in Sources */,
@@ -652,6 +662,7 @@
 				DB7974F52BBC119600E801B0 /* PrivateViewModel.swift in Sources */,
 				DBB8F7272B95E51C000C138F /* MainTabbarViewController.swift in Sources */,
 				DB2A44252BA3075F008051BB /* Comment.swift in Sources */,
+				DBD8C5892C58EB9F00FE2948 /* PrivateChatTableViewCell.swift in Sources */,
 				DBCA3D602BE0F32B00378E36 /* ChannelChatViewController.swift in Sources */,
 				DB7974F82BBC14B400E801B0 /* SettingViewController.swift in Sources */,
 				DBB0667D2B9852BB0086516D /* LessonsTableViewCell.swift in Sources */,
@@ -686,6 +697,7 @@
 				DB4155162C5592070046344D /* NewConversationViewController.swift in Sources */,
 				DBCA3D5E2BE0F0C300378E36 /* ChatTableViewCell.swift in Sources */,
 				DBF8F4942BEB7CB600C52A71 /* ProfileViewController.swift in Sources */,
+				DBD8C58B2C58ECA500FE2948 /* PrivateChatTableViewCellViewModel.swift in Sources */,
 				DBB066762B9851FF0086516D /* FeedViewModel.swift in Sources */,
 				DB4155142C5556DE0046344D /* ChatTableViewViewModel.swift in Sources */,
 				DBB8F72F2B95E57E000C138F /* PrivateViewController.swift in Sources */,

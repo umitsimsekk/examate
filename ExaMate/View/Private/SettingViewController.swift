@@ -243,6 +243,17 @@ class SettingViewController: UIViewController {
         txtField.textContentType = .emailAddress
         return txtField
     }()
+    
+    private let signOutButton : UIButton = {
+        let button = UIButton()
+        button.setTitle("Çıkış", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .red
+        button.titleLabel?.textAlignment = .center
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        button.layer.cornerRadius = 12
+        return button
+    }()
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -298,6 +309,9 @@ extension SettingViewController {
     @objc func didTapLesson(){
         let vc = SettingLessonViewController()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    @objc func didTapSignOut(){
+        
     }
     @objc func didTapProfilePhoto(){
         let actionSheet = UIAlertController(title: "Attach photo", message: "Where would you like to attach a photo from", preferredStyle: .actionSheet)
@@ -383,10 +397,15 @@ extension SettingViewController : SettingViewControllerInterface {
         classContainerView.addSubview(classImageContainerView)
         classContainerView.addSubview(classTextField)
         view.addSubview(classContainerView)
+        
+        // signOut
+        
+        view.addSubview(signOutButton)
     }
     func addButton() {
         lessonTextField.addTarget(self, action: #selector(didTapLesson), for: .touchDown)
         classTextField.addTarget(self, action: #selector(didTapClass), for: .touchDown)
+        signOutButton.addTarget(self, action: #selector(didTapSignOut), for: .allTouchEvents)
         
         profileImgView.isUserInteractionEnabled = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapProfilePhoto))
@@ -492,6 +511,13 @@ extension SettingViewController : SettingViewControllerInterface {
                                           y: 5,
                                       width: classContainerView.width-70,
                                           height: 40)
+        
+        //Sign Out
+        
+        signOutButton.frame = CGRect(x: 10,
+                                     y: classContainerView.bottom+5,
+                                     width: view.width-20,
+                                     height: 60)
     }
 }
 extension SettingViewController : UINavigationControllerDelegate, UIImagePickerControllerDelegate {

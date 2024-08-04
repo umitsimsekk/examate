@@ -9,11 +9,8 @@ import UIKit
 import MessageKit
 import InputBarAccessoryView
 
-struct sendImageToChat {
-    
-}
-
 protocol PrivateChatViewControllerInterface : AnyObject {
+    var avatar : Avatar?{get set}
     func setCollectionViewDelegates()
     func createMessageId() -> String?
     func listenForMessage()
@@ -22,7 +19,7 @@ protocol PrivateChatViewControllerInterface : AnyObject {
 }
 class PrivateChatViewController: MessagesViewController {
 
-    
+    var avatar : Avatar?
     private let otherUserEmail : String
     public var isNewConversation = false
     public var messages = [Message]()
@@ -113,9 +110,30 @@ extension PrivateChatViewController : MessagesDataSource,MessagesDisplayDelegate
     }
     func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
         let message = messages[indexPath.section]
-        let imageView = UIImageView()
+        self.viewModel.getUserProfilePic(with: message.sender.senderId)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4), execute: {
+            guard let avt = self.avatar else { return}
+            avatarView.set(avatar: avt)
+        })
+    
+    }
+    func configureMediaMessageImageView(_ imageView: UIImageView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        guard let message = message as? Message else {
+            return
+        }
         
-
+        switch message.kind {
+        case .photo(let media):
+            guard let mediaUrl = media.url else {
+                return
+            }
+            imageView.sd_setImage(with: mediaUrl)
+        default:
+            break
+        }
+    }
+    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 35
     }
     
 }

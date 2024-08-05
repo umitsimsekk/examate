@@ -24,6 +24,7 @@ protocol SettingViewModelInterface{
     func viewDidLoad()
     func viewDidLayoutSubviews()
     func insertProfileInfo(profile: Profile, data: Data)
+    func signOut()
 }
 
 class SettingViewModel {
@@ -31,9 +32,13 @@ class SettingViewModel {
     var database: DatabaseManagerProtocol = DatabaseManager()
     var auth: AuthManagerProtocol = AuthManager()
     var storage: StorageManagerProtocol = StorageManager()
+    
 }
 
 extension SettingViewModel : SettingViewModelInterface {
+    func signOut(){
+        auth.logOut()
+    }
     func insertProfileInfo(profile: Profile, data: Data) {
         storage.uploadSettingsProfileImage(sender_email: profile.email, imageData: data) { uploaded in
             if uploaded {

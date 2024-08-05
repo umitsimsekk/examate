@@ -13,11 +13,21 @@ protocol AuthManagerProtocol {
     func createUser(withEmail email : String, password: String, completion: @escaping(Bool)->Void)
     func signIn(withEmail email: String, password: String, completion: @escaping(Bool)->Void)
     func getCurrentUserEmail() -> String
+    func logOut()
 
 }
 class AuthManager : AuthManagerProtocol {
-    let auth = FirebaseAuth.Auth.auth()
     
+    let auth = FirebaseAuth.Auth.auth()
+    func logOut(){
+        do {
+            try auth.signOut()
+            
+        } catch {
+            print("error")
+
+        }
+    }
     func createUser(withEmail email : String, password: String, completion: @escaping(Bool)->Void) {
         auth.createUser(withEmail: email, password: password) { _, error in
             guard error == nil else {

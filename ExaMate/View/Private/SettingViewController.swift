@@ -311,7 +311,8 @@ extension SettingViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     @objc func didTapSignOut(){
-        
+        viewModel.signOut()
+
     }
     @objc func didTapProfilePhoto(){
         let actionSheet = UIAlertController(title: "Attach photo", message: "Where would you like to attach a photo from", preferredStyle: .actionSheet)
